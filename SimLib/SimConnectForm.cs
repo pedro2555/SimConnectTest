@@ -21,6 +21,16 @@ namespace SimLib
             FLAPS_DEC,
             FLAPS_UP,
             FLAPS_DOWN,
+            REQUEST_AI_SET_SLEW,
+            REQUEST_SET_SLEW_AHEAD,
+            REQUEST_SET_SLEW_ALT,
+            REQUEST_SET_SLEW_HDG,
+            REQUEST_SET_SLEW_BANK,
+            REQUEST_SET_SLEW_PITCH,
+            REQUEST_SET_SLEW_SIDE,
+            REQUEST_AI_RELEASE,
+            SIMCONNECT_GROUP_PRIORITY_HIGHEST
+
         };
 
         enum NOTIFICATION_GROUPS
@@ -69,6 +79,45 @@ namespace SimLib
                 OnGround = 1,
                 Airspeed = 0
             }, EVENTS.FLAPS_DEC);
+        }
+
+        public void MoveAITrafficEvents()
+        {
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_AI_SET_SLEW, "SLEW_ON");
+
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_AHEAD, "AXIS_SLEW_AHEAD_SET");
+
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_ALT, "AXIS_SLEW_ALT_SET");
+
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_HDG, "AXIS_SLEW_HEADING_SET");
+
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_BANK, "AXIS_SLEW_BANK_SET");
+
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_PITCH, "AXIS_SLEW_PITCH_SET");
+
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_SIDE, "AXIS_SLEW_SIDEWAYS_SET");
+        }
+
+        public void SetSlewAITraffic()
+        {
+            simconnect.AIReleaseControl(1, EVENTS.REQUEST_AI_RELEASE);
+
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_AI_SET_SLEW, 1, EVENTS.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+        }
+
+        void SlewArround(uint data)
+        {
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_BANK, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_PITCH, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_HDG, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_AHEAD, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_ALT, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_SIDE, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
         }
 
         public async void openConnection()

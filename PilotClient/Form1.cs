@@ -60,6 +60,7 @@ namespace PilotClient
             CreateAircraft(data.callsign, data.latitude, data.longitude, data.altitude, data.type);
         }
 
+
         void displayText(string s)
         {
             // remove first string from output 
@@ -82,6 +83,7 @@ namespace PilotClient
                 longitude = -9.13,
                 altitude = 500
             });
+
         }
     }
 }
