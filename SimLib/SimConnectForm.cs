@@ -57,6 +57,20 @@ namespace SimLib
             }
         }
 
+        public void CreateAircraft(string callsign, double latitude, double longitude, double altitude, string type)
+        {
+            simconnect.AICreateNonATCAircraft(type, callsign, new SIMCONNECT_DATA_INITPOSITION() {
+                Latitude = latitude,
+                Longitude = longitude,
+                Altitude = altitude,
+                Pitch = -0,
+                Bank = -0,
+                Heading = 270,
+                OnGround = 1,
+                Airspeed = 0
+            }, EVENTS.FLAPS_DEC);
+        }
+
         public async void openConnection()
         {
             while (simconnect == null)

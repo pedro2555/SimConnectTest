@@ -54,6 +54,11 @@ namespace PilotClient
                     break;
             }
         }
+        
+        void recv_server_data_callback(dynamic data)
+        {
+            CreateAircraft(data.callsign, data.latitude, data.longitude, data.altitude, data.type);
+        }
 
         void displayText(string s)
         {
@@ -65,6 +70,18 @@ namespace PilotClient
 
             // display it 
             txtLog.Text = output;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            recv_server_data_callback(new
+            {
+                callsign = "TSZ001",
+                type = "Airbus A321",
+                latitude = 38.77,
+                longitude = -9.13,
+                altitude = 500
+            });
         }
     }
 }
