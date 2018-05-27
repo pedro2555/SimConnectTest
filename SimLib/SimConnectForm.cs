@@ -98,7 +98,7 @@ namespace SimLib
             simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_SIDE, "AXIS_SLEW_SIDEWAYS_SET");
         }
 
-        public void SetSlewAITraffic()
+        public void SetSlewAITraffic() 
         {
             simconnect.AIReleaseControl(1, EVENTS.REQUEST_AI_RELEASE);
 
