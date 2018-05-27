@@ -105,19 +105,19 @@ namespace SimLib
             simconnect.TransmitClientEvent(1, EVENTS.REQUEST_AI_SET_SLEW, 1, EVENTS.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
         }
 
-        void SlewArround(uint data)
+        void SlewArround(uint bank, uint pitch, uint hdg, uint ahead, uint alt, uint side)
         {
-            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_BANK, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_BANK, bank, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
 
-            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_PITCH, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_PITCH, pitch, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
 
-            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_HDG, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_HDG, hdg, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
 
-            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_AHEAD, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_AHEAD, ahead, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
 
-            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_ALT, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_ALT, alt, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
 
-            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_SIDE, data, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
+            simconnect.TransmitClientEvent(1, EVENTS.REQUEST_SET_SLEW_SIDE, side, NOTIFICATION_GROUPS.GROUP0, SIMCONNECT_EVENT_FLAG.DEFAULT);
         }
 
         public async void openConnection()
