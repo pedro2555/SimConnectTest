@@ -28,8 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.txtLog = new System.Windows.Forms.RichTextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.getHttp = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // txtLog
@@ -72,6 +74,7 @@
 
         private System.Windows.Forms.RichTextBox txtLog;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Timer getHttp;
     }
 }
 

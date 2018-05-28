@@ -3,6 +3,10 @@ using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net.Http;
+using System.Windows.Forms;
+using System.Net;
+using System.IO;
+using System.Text;
 
 namespace PilotClient
 {   
@@ -11,7 +15,6 @@ namespace PilotClient
     {
         private static readonly HttpClient client = new HttpClient();
 
-        private HttpRequestMessage message;
         // Response number 
         int response = 1;
 
@@ -40,17 +43,47 @@ namespace PilotClient
             displayText("Connected to simulator");
 
             Process.Start("http://37.59.115.154/html/login.html");
-            
+
+            requestLoginSquawk();
         }
 
-        private void requestLoginSquawk()
+        private async void requestLoginSquawk()
         {
-            message = new HttpRequestMessage(HttpMethod.Get, "https://49ce63db-126a-45c8-9493-04dd5206674f.mock.pstmn.io/login");
+            Console.WriteLine("Connecting...");
+
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("https://9e26cedc-3121-401b-8ed6-b20f49ffb955.mock.pstmn.io");
+
+            HttpResponseMessage response = client.GetAsync("/token").Result;
+            
+            compareSquawk(response);
+
+        }
+
+        private void compareSquawk(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+
+                if (response.Content.ReadAsStringAsync().Result == "4700")
+                {
+                    Console.WriteLine("Connected");
+                    MessageBox.Show("API Squawk Correct");
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("Not Authorized");
+                requestLoginSquawk();
+                Console.WriteLine("Trying Again...");
+            }
         }
 
         private void connectedExampleFrm_SimConnectClosed(object sender, EventArgs e)
         {
             displayText("Disconnected from simulator");
         }
+
     }
 }
