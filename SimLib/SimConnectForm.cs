@@ -1,18 +1,24 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
-using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SimLib
 {
-    public class SimConnectForm : Form
+    /// <summary>
+    /// Extends Windows.Forms to provide a wrapped access to SimConnect
+    /// </summary>
+    public partial class SimConnectForm : Form
     {
-        // User-defined win32 event 
-        const int WM_USER_SIMCONNECT = 0x0402;
+        /// <summary>
+        /// The user defined win32 event
+        /// </summary>
+        private const int WM_USER_SIMCONNECT = 0x0402;
 
-        // SimConnect object 
-        SimConnect simconnect = null;
+        /// <summary>
+        /// Internal SimConnect object
+        /// </summary>
+        private SimConnect simconnect = null;
 
         public enum EVENTS
         {
@@ -43,17 +49,12 @@ namespace SimLib
             }
         }
 
-        private void closeConnection()
-        {
-            if (simconnect != null)
-            {
-                // Dispose serves the same purpose as SimConnect_Close() 
-                simconnect.Dispose();
-                simconnect = null;
-            }
-        }
-
-        public async void openConnection()
+        /// <summary>
+        /// Asynchronous wait for a listening SimConnect server.
+        /// 
+        /// Listen to SimConnectOpen event
+        /// </summary>
+        public async void OpenSimConnect()
         {
             while (simconnect == null)
             {
@@ -62,7 +63,7 @@ namespace SimLib
                     // the constructor is similar to SimConnect_Open in the native API 
                     simconnect = new SimConnect("SimLib.SimLibSimConnect", Handle, WM_USER_SIMCONNECT, null, 0);
 
-                    initClientEvent();
+                    RegisterEvents();
                 }
                 catch (COMException)
                 {
@@ -102,29 +103,22 @@ namespace SimLib
 
         void simconnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
         {
+            if (simconnect != null)
+            {
+                simconnect.Dispose();
+                simconnect = null;
+            }
         }
 
-        // The case where the user closes Prepar3D 
-        void simconnect_OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
+        /// <summary>
+        /// Dispose the SimConnect object with form
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
         {
-            closeConnection();
-        }
+            DisposeSimConnect();
 
-        void simconnect_OnRecvException(SimConnect sender, SIMCONNECT_RECV_EXCEPTION data)
-        {
-        }
-
-        public delegate void SimConnectEvent(SimConnect sender, SIMCONNECT_RECV_EVENT recEvent);
-        public event SimConnectEvent OnSimConnectEvent;
-        private void simconnect_OnRecvEvent(SimConnect sender, SIMCONNECT_RECV_EVENT recEvent)
-        {
-            OnSimConnectEvent(sender, recEvent);
-        }
-
-        // The case where the user closes the client 
-        private void SimConnectForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            closeConnection();
+            base.Dispose(disposing);
         }
     }
 }
