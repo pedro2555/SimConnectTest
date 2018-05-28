@@ -27,7 +27,7 @@ namespace PilotClient
             FSUIPC result = new FSUIPC();
 
             try
-            {
+            {               
                 FSUIPCConnection.Process();
             }
             catch (Exception crap)

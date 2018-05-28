@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using System.Text;
+using FSUIPC;
 
 namespace PilotClient
 {   
@@ -14,6 +15,8 @@ namespace PilotClient
     public partial class connectedExampleFrm : SimConnectForm
     {
         private static readonly HttpClient client = new HttpClient();
+
+        public string assr { get; set; }
 
         // Response number 
         int response = 1;
@@ -23,7 +26,20 @@ namespace PilotClient
 
         public connectedExampleFrm()
         {
-            InitializeComponent();
+            InitializeComponent();           
+        }
+
+        public void fsuipcConn()
+        {
+            try
+            {
+                FSUIPCConnection.Open();
+
+            }
+            catch (Exception crap)
+            {
+                fsuipcConn();
+            }
         }
 
         void displayText(string s)
@@ -55,7 +71,11 @@ namespace PilotClient
             client.BaseAddress = new Uri("https://9e26cedc-3121-401b-8ed6-b20f49ffb955.mock.pstmn.io");
 
             HttpResponseMessage response = client.GetAsync("/token").Result;
-            
+
+            fsuipcConn();
+
+            Console.WriteLine("My Squawk: " + FSUIPC.GetCurrent().Squawk.ToString("X").PadLeft(4, '0'));
+
             compareSquawk(response);
 
         }
@@ -63,13 +83,25 @@ namespace PilotClient
         private void compareSquawk(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode)
-            {
-
-                if (response.Content.ReadAsStringAsync().Result == "4700")
+            {               
+                Console.WriteLine("Web Squawk: " + response.Content.ReadAsStringAsync().Result);
+                try
                 {
-                    Console.WriteLine("Connected");
-                    MessageBox.Show("API Squawk Correct");
+                    if (response.Content.ReadAsStringAsync().Result == FSUIPC.GetCurrent().Squawk.ToString("X").PadLeft(4, '0'))
+                    {
+                        Console.WriteLine("Connected");
+                        MessageBox.Show("API Squawk Correct");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Insert correct squawk");
+                        compareSquawk(response);
+                    }
                 }
+                catch (Exception)
+                {
+                    Console.WriteLine("Error CompareSquawk");
+                }               
 
             }
             else
@@ -78,7 +110,7 @@ namespace PilotClient
                 requestLoginSquawk();
                 Console.WriteLine("Trying Again...");
             }
-        }
+        }      
 
         private void connectedExampleFrm_SimConnectClosed(object sender, EventArgs e)
         {
