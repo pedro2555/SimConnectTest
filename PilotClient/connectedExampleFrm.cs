@@ -1,13 +1,19 @@
 ﻿using SimLib;
 using System;
 using System.Diagnostics;
+using System.Net.Sockets;
 using System.Net.Http;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace PilotClient
-{
+{   
+
     public partial class connectedExampleFrm : SimConnectForm
     {
+        private string OAuthToken
+        { get; set; }
+
         // Response number 
         int response = 1;
 
@@ -17,6 +23,8 @@ namespace PilotClient
         public connectedExampleFrm()
         {
             InitializeComponent();
+
+            OAuthToken = null;
         }
 
         void displayText(string s)
@@ -33,63 +41,50 @@ namespace PilotClient
 
         private void connectedExampleFrm_SimConnectOpen(object sender, EventArgs e)
         {
-            displayText("Connected to simulator");
-
+            // sim opened, send user to login form
             Process.Start("http://37.59.115.154/html/login.html");
-
-            requestLoginSquawk();
         }
 
-        private async void requestLoginSquawk()
+        /// <summary>
+        /// Validates a given ASSR code on the Auth API token endpoint, populates OAuthToken when a valid squawk code is set
+        /// </summary>
+        /// <param name="ASSR"></param>
+        private async void ValidateASSR(string ASSR)
         {
-            Console.WriteLine("Connecting...");
-
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://9e26cedc-3121-401b-8ed6-b20f49ffb955.mock.pstmn.io");
 
-            HttpResponseMessage response = client.GetAsync("/token").Result;
+            client.BaseAddress = new Uri("https://fa-authapi.herokuapp.com");
 
-            Console.WriteLine("My Squawk: " + "4700");
+            HttpResponseMessage response = await client.GetAsync("/token/" + ASSR);
 
-            compareSquawk(response);
 
-        }
-
-        private void compareSquawk(HttpResponseMessage response)
-        {
-            if (response.IsSuccessStatusCode)
+            if ((int)response.StatusCode == 200)
             {
-                Console.WriteLine("Web Squawk: " + response.Content.ReadAsStringAsync().Result);
-                try
-                {
-                    if (response.Content.ReadAsStringAsync().Result == "4700")
-                    {
-                        Console.WriteLine("Connected");
-                        MessageBox.Show("API Squawk Correct");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Insert correct squawk");
-                        compareSquawk(response);
-                    }
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Error CompareSquawk");
-                }
+                // logged in
 
+                // this is the secret to send on the next API requests
+                OAuthToken = response.Content.ReadAsStringAsync().Result;
             }
             else
             {
-                Console.WriteLine("Not Authorized");
-                requestLoginSquawk();
-                Console.WriteLine("Trying Again...");
+                OAuthToken = null; // not sure
             }
         }
 
         private void connectedExampleFrm_SimConnectClosed(object sender, EventArgs e)
         {
             displayText("Disconnected from simulator");
+        }
+
+        private void connectedExampleFrm_SimConnectTransponderChanged(object sender, EventArgs e)
+        {
+            TransponderChangedEventArgs args = (TransponderChangedEventArgs)e;
+
+            if (OAuthToken == null)
+            {
+                // validate new squawk codes on the API
+                ValidateASSR(args.Transponder.ToString("X").PadLeft(4, '0'));
+            }
         }
     }
 }
