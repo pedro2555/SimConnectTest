@@ -61,7 +61,6 @@
     <Compile Include="connectedExampleFrm.Designer.cs">
       <DependentUpon>connectedExampleFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FSUIPC.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="connectedExampleFrm.resx">

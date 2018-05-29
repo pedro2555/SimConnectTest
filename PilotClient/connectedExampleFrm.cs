@@ -29,19 +29,6 @@ namespace PilotClient
             InitializeComponent();           
         }
 
-        public void fsuipcConn()
-        {
-            try
-            {
-                FSUIPCConnection.Open();
-
-            }
-            catch (Exception crap)
-            {
-                fsuipcConn();
-            }
-        }
-
         void displayText(string s)
         {
             // remove first string from output 
@@ -72,9 +59,7 @@ namespace PilotClient
 
             HttpResponseMessage response = client.GetAsync("/token").Result;
 
-            fsuipcConn();
-
-            Console.WriteLine("My Squawk: " + FSUIPC.GetCurrent().Squawk.ToString("X").PadLeft(4, '0'));
+            Console.WriteLine("My Squawk: " + "4700");
 
             compareSquawk(response);
 
@@ -87,7 +72,7 @@ namespace PilotClient
                 Console.WriteLine("Web Squawk: " + response.Content.ReadAsStringAsync().Result);
                 try
                 {
-                    if (response.Content.ReadAsStringAsync().Result == FSUIPC.GetCurrent().Squawk.ToString("X").PadLeft(4, '0'))
+                    if (response.Content.ReadAsStringAsync().Result == "4700")
                     {
                         Console.WriteLine("Connected");
                         MessageBox.Show("API Squawk Correct");
