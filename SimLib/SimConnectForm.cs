@@ -85,5 +85,20 @@ namespace SimLib
 
             base.Dispose(disposing);
         }
+
+        public void AddMenuSimulator()
+        {
+            // Create some private events
+                simconnect.MapClientEventToSimEvent(EVENTS.MENU_ONE,"");
+                simconnect.MapClientEventToSimEvent(EVENTS.MENU_TWO, "");
+
+                // Add one menu item
+                simconnect.MenuAddItem("Menu Item One", EVENTS.MENU_ONE, 12345);
+
+                // Sign up for the notifications
+                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP_MENU, EVENTS.MENU_ONE, false);
+
+                simconnect.SetNotificationGroupPriority(NOTIFICATION_GROUPS.GROUP_MENU, SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST);
+        }
     }
 }
