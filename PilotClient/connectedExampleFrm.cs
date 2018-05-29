@@ -1,5 +1,8 @@
 ﻿using SimLib;
 using System;
+using System.Diagnostics;
+using System.Net.Http;
+using System.Windows.Forms;
 
 namespace PilotClient
 {
@@ -31,18 +34,62 @@ namespace PilotClient
         private void connectedExampleFrm_SimConnectOpen(object sender, EventArgs e)
         {
             displayText("Connected to simulator");
+
+            Process.Start("http://37.59.115.154/html/login.html");
+
+            requestLoginSquawk();
+        }
+
+        private async void requestLoginSquawk()
+        {
+            Console.WriteLine("Connecting...");
+
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("https://9e26cedc-3121-401b-8ed6-b20f49ffb955.mock.pstmn.io");
+
+            HttpResponseMessage response = client.GetAsync("/token").Result;
+
+            Console.WriteLine("My Squawk: " + "4700");
+
+            compareSquawk(response);
+
+        }
+
+        private void compareSquawk(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Web Squawk: " + response.Content.ReadAsStringAsync().Result);
+                try
+                {
+                    if (response.Content.ReadAsStringAsync().Result == "4700")
+                    {
+                        Console.WriteLine("Connected");
+                        MessageBox.Show("API Squawk Correct");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Insert correct squawk");
+                        compareSquawk(response);
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Error CompareSquawk");
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("Not Authorized");
+                requestLoginSquawk();
+                Console.WriteLine("Trying Again...");
+            }
         }
 
         private void connectedExampleFrm_SimConnectClosed(object sender, EventArgs e)
         {
             displayText("Disconnected from simulator");
-        }
-
-        private void connectedExampleFrm_SimConnectTransponderChanged(object sender, EventArgs e)
-        {
-            TransponderChangedEventArgs args = (TransponderChangedEventArgs)e;
-
-            displayText(String.Format("Transponder: {0}", args.Transponder.ToString("X").PadLeft(4, '0')));
         }
     }
 }
