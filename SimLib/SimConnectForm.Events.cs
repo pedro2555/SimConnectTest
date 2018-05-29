@@ -63,7 +63,9 @@ namespace SimLib
 
         private void simconnect_OnRecvEvent(SimConnect sender, SIMCONNECT_RECV_EVENT recEvent)
         {
-            SimConnectEvent(this, new EventArgs());
+            //SimConnectEvent(this, new EventArgs());
+            simconnect.MenuDeleteSubItem(EVENTS.MENU_ONE, EVENTS.MENU_TWO);
+            simconnect.MenuAddSubItem(EVENTS.MENU_ONE, "Disconnect", EVENTS.MENU_THREE, 10002);
         }
     }
 }

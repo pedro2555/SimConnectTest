@@ -20,6 +20,19 @@ namespace SimLib
         /// </summary>
         private SimConnect simconnect = null;
 
+        public enum EVENTS
+        {
+            MENU_ONE,
+            MENU_TWO,
+            MENU_THREE
+
+        };
+
+        enum NOTIFICATION_GROUPS
+        {
+            GROUP_MENU,
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -88,17 +101,19 @@ namespace SimLib
 
         public void AddMenuSimulator()
         {
-            // Create some private events
+                // Create some private events
                 simconnect.MapClientEventToSimEvent(EVENTS.MENU_ONE,"");
                 simconnect.MapClientEventToSimEvent(EVENTS.MENU_TWO, "");
+                simconnect.MapClientEventToSimEvent(EVENTS.MENU_THREE, "");
 
                 // Add one menu item
-                simconnect.MenuAddItem("Menu Item One", EVENTS.MENU_ONE, 12345);
+                simconnect.MenuAddItem("FlyAtlantic", EVENTS.MENU_ONE, 10000);
+                simconnect.MenuAddSubItem(EVENTS.MENU_ONE, "Connect", EVENTS.MENU_TWO, 10001);                
 
-                // Sign up for the notifications
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP_MENU, EVENTS.MENU_ONE, false);
+                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP_MENU, EVENTS.MENU_TWO, false);
 
                 simconnect.SetNotificationGroupPriority(NOTIFICATION_GROUPS.GROUP_MENU, SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST);
+
         }
     }
 }

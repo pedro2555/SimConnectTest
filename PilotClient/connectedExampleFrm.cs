@@ -31,6 +31,8 @@ namespace PilotClient
         private void connectedExampleFrm_SimConnectOpen(object sender, EventArgs e)
         {
             displayText("Connected to simulator");
+
+            AddMenuSimulator();
         }
 
         private void connectedExampleFrm_SimConnectClosed(object sender, EventArgs e)
