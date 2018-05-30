@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Threading.Tasks;
 using Quobject.SocketIoClientDotNet.Client;
 using System.Collections.Immutable;
+using Newtonsoft.Json;
 
 namespace PilotClient
 {   
@@ -74,6 +75,7 @@ namespace PilotClient
                 WebSocket.On("position", (data) =>
                 {
                     Console.WriteLine(data.ToString());
+
                 });
                 WebSocket.Open();
             }
@@ -107,14 +109,18 @@ namespace PilotClient
         private void connectedExampleFrm_SimConnectPositionChanged(object sender, EventArgs e)
         {
             PositionChangedEventArgs args = (PositionChangedEventArgs)e;
+
+            Position location = new Position();
+
+            location.title = OAuthToken;
+            location.latitude = args.position.latitude;
+            location.longitude = args.position.longitude;
+            location.altitude = args.position.altitude;
+
+            string output = JsonConvert.SerializeObject(location);
+
             if (WebSocket != null && OAuthToken != null)
-                WebSocket.Emit(
-                    "position",
-                    String.Format("\"token\":\"{0}\",\"lat\":\"{1}\",\"lon\":\"{2}\",\"alt\":\"{3}\"",
-                        OAuthToken,
-                        args.position.latitude,
-                        args.position.longitude,
-                        args.position.altitude));
+                WebSocket.Emit("position", output);
         }
     }
 }
