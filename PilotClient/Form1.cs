@@ -1,4 +1,5 @@
-﻿using SimLib;
+﻿using Microsoft.FlightSimulator.SimConnect;
+using SimLib;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,33 +25,30 @@ namespace PilotClient
             InitializeComponent();
         }
 
-        private void Form1_OnSimConnectEvent(Microsoft.FlightSimulator.SimConnect.SimConnect sender, Microsoft.FlightSimulator.SimConnect.SIMCONNECT_RECV_EVENT recEvent)
+        private void Form1_OnSimConnectEvent(Microsoft.FlightSimulator.SimConnect.SimConnect sender, Microsoft.FlightSimulator.SimConnect.SIMCONNECT_RECV_EVENT data)
         {
-            switch (recEvent.uEventID)
+            //switch (recEvent.uEventID)
+            //{
+            //    case (uint)EVENTS.PITOT_TOGGLE:
+
+            //        displayText("PITOT switched");
+            //        break;
+
+            //}
+
+            switch (data.dwID)
             {
-                case (uint)EVENTS.PITOT_TOGGLE:
+                case (uint)DATA_REQUESTS.REQUEST_1:
+                    Struct1 s1 = (Struct1)data.dwData[0];
 
-                    displayText("PITOT switched");
+                    displayText("Title: " + s1.title);
+                    displayText("Lat:   " + s1.latitude);
+                    displayText("Lon:   " + s1.longitude);
+                    displayText("Alt:   " + s1.altitude);
                     break;
 
-                case (uint)EVENTS.FLAPS_UP:
-
-                    displayText("Flaps Up");
-                    break;
-
-                case (uint)EVENTS.FLAPS_DOWN:
-
-                    displayText("Flaps Down");
-                    break;
-
-                case (uint)EVENTS.FLAPS_INC:
-
-                    displayText("Flaps Inc");
-                    break;
-
-                case (uint)EVENTS.FLAPS_DEC:
-
-                    displayText("Flaps Dec");
+                default:
+                    displayText("Unknown request ID: " + data.dwID);
                     break;
             }
         }
@@ -66,5 +64,29 @@ namespace PilotClient
             // display it 
             txtLog.Text = output;
         }
+
+        void recv_server_data_callback(dynamic data)
+        {
+            CreateAircraft(data.callsign, data.latitude, data.longitude, data.altitude, data.type);
+        }
+
+        private void btnCreateAI_Click(object sender, EventArgs e)
+        {
+            recv_server_data_callback(new
+            {
+                callsign = "TSZ001",
+                type = "Airbus A321",
+                latitude = 38.76697,
+                longitude = -9.143276,
+                altitude = 500
+            });
+        }
+
+        private void btnGetPosition_Click(object sender, EventArgs e)
+        {
+            RequestDataOnSimObjectType();
+            displayText("Request sent...");
+        }
+
     }
 }

@@ -16,17 +16,31 @@ namespace SimLib
 
         public enum EVENTS
         {
-            PITOT_TOGGLE,
-            FLAPS_INC,
-            FLAPS_DEC,
-            FLAPS_UP,
-            FLAPS_DOWN,
+            
         };
 
-        enum NOTIFICATION_GROUPS
+        public enum DEFINITIONS
         {
-            GROUP0,
+            Struct1,
         }
+
+        public enum DATA_REQUESTS
+        {
+            REQUEST_1,
+        };
+
+        // this is how you declare a data structure so that 
+        // simconnect knows how to fill it/read it. 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+        public struct Struct1
+        {
+            // this is how you declare a fixed size string 
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+            public String title;
+            public double latitude;
+            public double longitude;
+            public double altitude;
+        };
 
         // Simconnect client will send a win32 message when there is 
         // a packet to process. ReceiveMessage must be called to 
@@ -90,28 +104,31 @@ namespace SimLib
                 // listen to events 
                 simconnect.OnRecvEvent += new SimConnect.RecvEventEventHandler(simconnect_OnRecvEvent);
 
-                // subscribe to pitot heat switch toggle 
-                simconnect.MapClientEventToSimEvent(EVENTS.PITOT_TOGGLE, "PITOT_HEAT_TOGGLE");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.PITOT_TOGGLE, false);
+                // define a data structure 
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Title", null, SIMCONNECT_DATATYPE.STRING256, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Plane Latitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Plane Longitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Plane Altitude", "feet", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 
-                // subscribe to all four flaps controls 
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_UP, "FLAPS_UP");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_UP, false);
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_DOWN, "FLAPS_DOWN");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_DOWN, false);
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_INC, "FLAPS_INCR");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_INC, false);
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_DEC, "FLAPS_DECR");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_DEC, false);
+                // IMPORTANT: register it with the simconnect managed wrapper marshaller 
+                // if you skip this step, you will only receive a uint in the .dwData field. 
+                simconnect.RegisterDataDefineStruct<Struct1>(DEFINITIONS.Struct1);
 
-                // set the group priority 
-                simconnect.SetNotificationGroupPriority(NOTIFICATION_GROUPS.GROUP0, SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST);
+                // catch a simobject data request 
+                simconnect.OnRecvSimobjectDataBytype += new SimConnect.RecvSimobjectDataBytypeEventHandler(simconnect_OnRecvSimobjectDataBytype);
 
             }
             catch (COMException ex)
             {
                 throw ex;
             }
+        }
+
+        public delegate void DataRequestEvent(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA_BYTYPE data);
+        public event DataRequestEvent OnDataRequestEvent;
+        private void simconnect_OnRecvSimobjectDataBytype(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA_BYTYPE data)
+        {
+            OnDataRequestEvent(sender, data);
         }
 
         void simconnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
@@ -139,6 +156,26 @@ namespace SimLib
         private void SimConnectForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             closeConnection();
+        }
+
+        public void CreateAircraft(string callsign, double latitude, double longitude, double altitude, string type)
+        {
+            simconnect.AICreateNonATCAircraft(type, callsign, new SIMCONNECT_DATA_INITPOSITION()
+            {
+                Latitude = latitude,
+                Longitude = longitude,
+                Altitude = altitude,
+                Pitch = -0,
+                Bank = -0,
+                Heading = 270,
+                OnGround = 1,
+                Airspeed = 0
+            }, SIMCONNECT_SIMOBJECT_TYPE.AIRCRAFT);
+        }  
+        
+        public void RequestDataOnSimObjectType()
+        {
+            simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.REQUEST_1, DEFINITIONS.Struct1, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);          
         }
     }
 }
