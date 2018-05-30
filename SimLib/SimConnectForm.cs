@@ -14,15 +14,6 @@ namespace SimLib
         // SimConnect object 
         SimConnect simconnect = null;
 
-        public enum EVENTS
-        {
-            PITOT_TOGGLE,
-        };
-
-        enum NOTIFICATION_GROUPS
-        {
-            GROUP0,
-        }
 
         // Simconnect client will send a win32 message when there is 
         // a packet to process. ReceiveMessage must be called to 
@@ -86,13 +77,7 @@ namespace SimLib
                 // listen to events 
                 simconnect.OnRecvEvent += new SimConnect.RecvEventEventHandler(simconnect_OnRecvEvent);
 
-                // subscribe to pitot heat switch toggle 
-                simconnect.MapClientEventToSimEvent(EVENTS.PITOT_TOGGLE, "PITOT_HEAT_TOGGLE");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.PITOT_TOGGLE, false);
-
-                // set the group priority 
-                simconnect.SetNotificationGroupPriority(NOTIFICATION_GROUPS.GROUP0, SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST);
-
+                RegisterDataDefinitions();
             }
             catch (COMException ex)
             {
@@ -126,5 +111,208 @@ namespace SimLib
         {
             closeConnection();
         }
-    }
+
+        public void RegisterDataDefinitions()
+        {
+            // register data structures
+            simconnect.AddToDataDefinition(
+                DEFINITIONS.Compass,
+                "PLANE HEADING DEGREES MAGNETIC",
+                "degrees",
+                SIMCONNECT_DATATYPE.INT32,
+                0.0f,
+                SimConnect.SIMCONNECT_UNUSED);
+            simconnect.RegisterDataDefineStruct<Telemetry>(DEFINITIONS.Compass);
+
+            simconnect.AddToDataDefinition(
+               DEFINITIONS.Pitch,
+               "PLANE PITCH DEGREES",
+               "degrees",
+               SIMCONNECT_DATATYPE.INT32,
+               0.0f,
+               SimConnect.SIMCONNECT_UNUSED);
+            simconnect.RegisterDataDefineStruct<Telemetry>(DEFINITIONS.Pitch);
+
+            simconnect.AddToDataDefinition(
+                DEFINITIONS.Altitude,
+                "PLANE ALTITUDE",
+                "feet",
+                SIMCONNECT_DATATYPE.INT32,
+                0,
+                SimConnect.SIMCONNECT_UNUSED);
+            simconnect.RegisterDataDefineStruct<Telemetry>(DEFINITIONS.Altitude);
+
+            simconnect.AddToDataDefinition(
+                DEFINITIONS.Latitude,
+                "PLANE LATITUDE",
+                "degrees",
+                SIMCONNECT_DATATYPE.FLOAT64,
+                0.0f,
+                SimConnect.SIMCONNECT_UNUSED);
+            simconnect.RegisterDataDefineStruct<Telemetry>(DEFINITIONS.Latitude);
+
+            simconnect.AddToDataDefinition(
+                DEFINITIONS.Longitude,
+                "PLANE LONGITUDE",
+                "degrees",
+                SIMCONNECT_DATATYPE.FLOAT64,
+                0.0f,
+                SimConnect.SIMCONNECT_UNUSED);
+            simconnect.RegisterDataDefineStruct<Telemetry>(DEFINITIONS.Longitude);
+
+            // register the main data event handler
+            simconnect.OnRecvSimobjectDataBytype += Simconnect_OnRecvSimobjectDataBytype;
+
+            simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Compass, DEFINITIONS.Compass, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+            simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Pitch, DEFINITIONS.Pitch, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+            simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Altitude, DEFINITIONS.Altitude, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+            simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Latitude, DEFINITIONS.Latitude, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+            simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Longitude, DEFINITIONS.Longitude, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+        }
+
+        private void Simconnect_OnRecvSimobjectDataBytype(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA_BYTYPE data)
+        {
+            try
+            {
+                switch ((DATA_REQUESTS)data.dwRequestID)
+                {
+                    case DATA_REQUESTS.Compass:
+                        Telemetry CurrentCompass = (Telemetry)data.dwData[0];
+                        if (LastCompass.Heading != CurrentCompass.Heading)
+                        {
+                            LastCompass.Heading = CurrentCompass.Heading;
+                            SimConnectHeadingChanged(sender, new CompassChangedEventArgs() { Heading = CurrentCompass.Heading });
+
+                            // re-register SimConnect listener
+                        }
+                        simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Compass, DEFINITIONS.Compass, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+                        break;
+
+                    //case DATA_REQUESTS.Pitch:
+                    //    Telemetry CurrentPitch = (Telemetry)data.dwData[0];
+                    //    if (LastPitch.Pitch != CurrentPitch.Pitch)
+                    //    {
+                    //        LastPitch.Pitch = CurrentPitch.Pitch;
+                    //        SimConnectPitchChanged(sender, new PitchChangedEventArgs() { Pitch = CurrentPitch.Pitch });
+
+                    //        // re-register SimConnect listener
+                    //    }
+                    //    simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Pitch, DEFINITIONS.Pitch, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+                    //    break;
+
+                    //case DATA_REQUESTS.Latitude:
+                    //    Telemetry CurrentLatitude = (Telemetry)data.dwData[0];
+                    //    if (LastLatitude.Latitude != CurrentLatitude.Latitude)
+                    //    {
+                    //        LastLatitude.Latitude = CurrentLatitude.Latitude;
+                    //        SimConnectLatitudeChanged(sender, new LatitudeChangedEventArgs() { Latitude = CurrentLatitude.Latitude });
+
+                    //        // re-register SimConnect listener
+                    //    }
+                    //    simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Latitude, DEFINITIONS.Latitude, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+                    //    break;
+
+                    //case DATA_REQUESTS.Altitude:
+                    //    Telemetry CurrentAltitude = (Telemetry)data.dwData[0];
+                    //    if (LastAltitude.Altitude != CurrentAltitude.Altitude)
+                    //    {
+                    //        LastAltitude.Altitude = CurrentAltitude.Altitude;
+                    //        SimConnectAltitudeChanged(sender, new AltitudeChangedEventArgs() { Altitude = CurrentAltitude.Altitude });
+
+                    //        // re-register SimConnect listener
+                    //    }
+                    //    simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Altitude, DEFINITIONS.Altitude, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+                    //    break;
+
+                    //case DATA_REQUESTS.Longitude:
+                    //    Telemetry CurrentLongitude = (Telemetry)data.dwData[0];
+                    //    if (LastLongitude.Longitude != CurrentLongitude.Longitude)
+                    //    {
+                    //        LastLongitude.Longitude = CurrentLongitude.Longitude;
+                    //        SimConnectLongitudeChanged(sender, new LongitudeChangedEventArgs() { Longitude = CurrentLongitude.Longitude });
+
+                    //        // re-register SimConnect listener
+                    //    }
+                    //    simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.Longitude, DEFINITIONS.Longitude, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+                    //    break;
+                    default:
+                        break;
+                }
+            }
+            catch (COMException ex)
+            {
+                throw ex;
+            }
+        }
+
+        enum DEFINITIONS
+        {
+            Compass,
+            Latitude,
+            Longitude,
+            Altitude,
+            Pitch,
+        }
+
+        enum DATA_REQUESTS
+        {
+            Compass,
+            Latitude,
+            Longitude,
+            Altitude,
+            Pitch,
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+        public struct Telemetry
+        {
+            public int Heading;
+            public double Latitude;
+            public double Longitude;
+            public int Altitude;
+            public int Pitch;
+        }
+
+        public Telemetry LastCompass;
+        public Telemetry LastLatitude;
+        public Telemetry LastLongitude;
+        public Telemetry LastAltitude;
+        public Telemetry LastPitch;
+
+        public class CompassChangedEventArgs : EventArgs
+        {
+            public int Heading
+            { get; internal set; }
+        }
+
+        public class LatitudeChangedEventArgs : EventArgs
+        {
+            public double Latitude
+            { get; internal set; }
+        }
+
+        public class LongitudeChangedEventArgs : EventArgs
+        {
+            public double Longitude
+            { get; internal set; }
+        }
+
+        public class AltitudeChangedEventArgs : EventArgs
+        {
+            public int Altitude
+            { get; internal set; }
+        }
+
+        public class PitchChangedEventArgs : EventArgs
+        {
+            public int Pitch
+            { get; internal set; }
+        }
+
+        public event EventHandler SimConnectHeadingChanged;
+        public event EventHandler SimConnectLatitudeChanged;
+        public event EventHandler SimConnectLongitudeChanged;
+        public event EventHandler SimConnectAltitudeChanged;
+        public event EventHandler SimConnectPitchChanged;
+    }    
 }

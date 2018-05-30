@@ -47,5 +47,40 @@ namespace PilotClient
             // display it 
             txtLog.Text = output;
         }
+
+        private void Form1_SimConnectHeadingChanged(object sender, EventArgs e)
+        {
+            CompassChangedEventArgs args = (CompassChangedEventArgs)e;
+
+            txtHDG.Text =  args.Heading.ToString();
+        }
+
+        private void Form1_SimConnectLatitudeChanged(object sender, EventArgs e)
+        {
+            LatitudeChangedEventArgs args = (LatitudeChangedEventArgs)e;
+
+            txtLAT.Text = args.Latitude.ToString();
+        }
+
+        private void Form1_SimConnectLongitudeChanged(object sender, EventArgs e)
+        {
+            LongitudeChangedEventArgs args = (LongitudeChangedEventArgs)e;
+
+            txtLon.Text =  args.Longitude.ToString();
+        }
+
+        private void Form1_SimConnectAltitudeChanged(object sender, EventArgs e)
+        {
+            AltitudeChangedEventArgs args = (AltitudeChangedEventArgs)e;
+
+            txtALT.Text = args.Altitude.ToString();
+        }
+
+        private void Form1_SimConnectPitchChanged(object sender, EventArgs e)
+        {
+            PitchChangedEventArgs args = (PitchChangedEventArgs)e;
+
+            txtPitch.Text = args.Pitch.ToString();
+        }
     }
 }
