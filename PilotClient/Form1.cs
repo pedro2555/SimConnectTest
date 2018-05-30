@@ -28,30 +28,11 @@ namespace PilotClient
         {
             switch (recEvent.uEventID)
             {
-                case (uint)EVENTS.PITOT_TOGGLE:
+                //case (uint)EVENTS.PITOT_TOGGLE:
 
-                    displayText("PITOT switched");
-                    break;
+                //    displayText("PITOT switched");
+                //    break;
 
-                case (uint)EVENTS.FLAPS_UP:
-
-                    displayText("Flaps Up");
-                    break;
-
-                case (uint)EVENTS.FLAPS_DOWN:
-
-                    displayText("Flaps Down");
-                    break;
-
-                case (uint)EVENTS.FLAPS_INC:
-
-                    displayText("Flaps Inc");
-                    break;
-
-                case (uint)EVENTS.FLAPS_DEC:
-
-                    displayText("Flaps Dec");
-                    break;
             }
         }
 
