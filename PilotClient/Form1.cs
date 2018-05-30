@@ -1,5 +1,4 @@
-﻿using Microsoft.FlightSimulator.SimConnect;
-using SimLib;
+﻿using SimLib;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
