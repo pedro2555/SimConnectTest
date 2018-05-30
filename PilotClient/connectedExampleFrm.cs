@@ -120,7 +120,7 @@ namespace PilotClient
             string output = JsonConvert.SerializeObject(location);
 
             if (WebSocket != null && OAuthToken != null)
-                WebSocket.Emit(output);
+                WebSocket.Emit("position:", output);
         }
 
     }
