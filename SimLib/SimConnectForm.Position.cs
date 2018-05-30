@@ -44,7 +44,7 @@ namespace SimLib
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
-        public class Position
+        public struct Position
         {
             // this is how you declare a fixed size string 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
