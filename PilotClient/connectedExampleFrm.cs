@@ -121,16 +121,18 @@ namespace PilotClient
                     }
                     else
                     {
-                    Position payload = JsonConvert.DeserializeObject<Position>(Encoding.UTF8.GetString(buff).TrimEnd('\0'));
-
-                    displayText(JsonConvert.SerializeObject(payload));
 
                     var str = Encoding.UTF8.GetString(buff, 0, result.Count);
                     stringResult.Append(str);
+
+                    
                     }
 
                 } while (!result.EndOfMessage);
 
+                Position payload = JsonConvert.DeserializeObject<Position>(stringResult.ToString());
+
+                displayText(JsonConvert.SerializeObject(payload));
 
             }
         }
