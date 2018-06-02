@@ -107,18 +107,31 @@ namespace PilotClient
             byte[] buff = new byte[2048];
             while (ws.State == WebSocketState.Open)
             {
-                var result = await ws.ReceiveAsync(new ArraySegment<byte>(buff), CancellationToken.None);
+                var stringResult = new StringBuilder();
 
-                if (result.MessageType == WebSocketMessageType.Close)
+                WebSocketReceiveResult result;
+                do
                 {
-                    await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-                }
-                else
-                {
+
+                    result = await ws.ReceiveAsync(new ArraySegment<byte>(buff), CancellationToken.None);
+
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                    }
+                    else
+                    {
                     Position payload = JsonConvert.DeserializeObject<Position>(Encoding.UTF8.GetString(buff).TrimEnd('\0'));
 
                     displayText(JsonConvert.SerializeObject(payload));
-                }
+
+                    var str = Encoding.UTF8.GetString(buff, 0, result.Count);
+                    stringResult.Append(str);
+                    }
+
+                } while (!result.EndOfMessage);
+
+
             }
         }
 
