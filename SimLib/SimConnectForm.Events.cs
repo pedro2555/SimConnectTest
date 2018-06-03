@@ -21,7 +21,7 @@ namespace SimLib
         public event EventHandler SimConnectClosed;
 
 
-        public List<AITrafficConnected> AiTraffic = new List<AITrafficConnected>();
+        public Dictionary<uint, uint> AiTraffic = new Dictionary<uint, uint>();
 
         // Set up all the SimConnect related event handlers 
         private void RegisterEvents()
@@ -50,10 +50,7 @@ namespace SimLib
 
         private void SimConnect_OnRecvAssignedObjectID(SimConnect sender, SIMCONNECT_RECV_ASSIGNED_OBJECT_ID data)
         {
-            AiTraffic.Add(new AITrafficConnected {
-                ObjectID = data.dwObjectID,
-                RequestedID = data.dwRequestID
-            });
+            AiTraffic.Add(data.dwRequestID, data.dwObjectID);
         }
 
             private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)

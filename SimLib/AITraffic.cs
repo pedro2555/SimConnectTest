@@ -20,10 +20,5 @@ namespace SimLib
             set;
         }
 
-        public uint LastRequestedID
-        {
-            get;
-            set;
-        }
     }
 }

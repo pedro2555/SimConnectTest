@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
+using System.Collections.Generic;
 
 namespace PilotClient
 {
@@ -19,7 +20,7 @@ namespace PilotClient
         { get; set; }
 
         // Response number 
-        int response = 1;
+        int response = 1;       
 
         uint LastRequestedID { get; set;}
 
@@ -110,15 +111,16 @@ namespace PilotClient
                 trafficId = await AddAITrafficAsync(payload);
 
                 LastRequestedID = 2;
+
             }
             else
             {
                 foreach (var item in AiTraffic)
                 {
-                    if (item.RequestedID != LastRequestedID && LastRequestedID != 0)
+                    if (item.Key != LastRequestedID && LastRequestedID != 0)
                     {                                              
 
-                        LastRequestedID = item.RequestedID;
+                        LastRequestedID = item.Key;
 
                         trafficId = await AddAITrafficAsync(payload);
 
