@@ -1,5 +1,6 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -18,6 +19,9 @@ namespace SimLib
         /// Raised when a connection to SimConnect server is closed by the server.
         /// </summary>
         public event EventHandler SimConnectClosed;
+
+
+        public List<uint> AiTraffic = new List<uint>();
 
         // Set up all the SimConnect related event handlers 
         private void RegisterEvents()
@@ -46,7 +50,7 @@ namespace SimLib
 
         private void SimConnect_OnRecvAssignedObjectID(SimConnect sender, SIMCONNECT_RECV_ASSIGNED_OBJECT_ID data)
         {
-            Console.WriteLine("Object ID: {0}", data.dwObjectID);
+            AiTraffic.Add(data.dwObjectID);
         }
 
             private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
