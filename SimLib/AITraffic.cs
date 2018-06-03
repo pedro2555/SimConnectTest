@@ -6,5 +6,24 @@ using System.Threading.Tasks;
 
 namespace SimLib
 {
+    public class AITrafficConnected
+    {
+        public uint ObjectID
+        {
+            get;
+            set;
+        }
 
+        public uint RequestedID
+        {
+            get;
+            set;
+        }
+
+        public uint LastRequestedID
+        {
+            get;
+            set;
+        }
+    }
 }

@@ -21,6 +21,8 @@ namespace PilotClient
         // Response number 
         int response = 1;
 
+        uint LastRequestedID { get; set;}
+
         // Output text - display a maximum of 10 lines 
         string output = "\n\n\n\n\n\n\n\n\n\n";
 
@@ -96,14 +98,34 @@ namespace PilotClient
                 await Task.Delay(millisecondDelay);
             }
         }
-
+        
         private async void Receive(object sender, MessageEventArgs e)
         {
-            Position payload = JsonConvert.DeserializeObject<Position>(e.Data);
+            uint trafficId;
+            
+            Position payload = JsonConvert.DeserializeObject<Position>(e.Data);            
 
-            uint trafficId = await AddAITrafficAsync(payload);
+            if(AiTraffic.Count == 0)
+            {
+                trafficId = await AddAITrafficAsync(payload);
 
-            displayText(trafficId.ToString());
+                LastRequestedID = 2;
+            }
+            else
+            {
+                foreach (var item in AiTraffic)
+                {
+                    if (item.RequestedID != LastRequestedID && LastRequestedID != 0)
+                    {                                              
+
+                        LastRequestedID = item.RequestedID;
+
+                        trafficId = await AddAITrafficAsync(payload);
+
+                        displayText(trafficId.ToString());
+                    }
+                }
+            }
         }
 
         private void connectedExampleFrm_SimConnectClosed(object sender, EventArgs e)
