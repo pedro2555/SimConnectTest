@@ -35,6 +35,8 @@ namespace SimLib
                 simconnect.OnRecvEvent += new SimConnect.RecvEventEventHandler(SimConnect_OnRecvEvent);
                 simconnect.OnRecvSimobjectDataBytype += new SimConnect.RecvSimobjectDataBytypeEventHandler(SimConnect_OnRecvSimobjectDataBytype);
 
+                simconnect.OnRecvAssignedObjectId += new SimConnect.RecvAssignedObjectIdEventHandler(SimConnect_OnRecvAssignedObjectID);
+
             }
             catch (COMException ex)
             {
@@ -42,7 +44,12 @@ namespace SimLib
             }
         }
 
-        private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
+        private void SimConnect_OnRecvAssignedObjectID(SimConnect sender, SIMCONNECT_RECV_ASSIGNED_OBJECT_ID data)
+        {
+            Console.WriteLine("Object ID: {0}", data.dwObjectID);
+        }
+
+            private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
         {
             SimConnectOpen(this, new EventArgs());
         }
