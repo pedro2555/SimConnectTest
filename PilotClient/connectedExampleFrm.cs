@@ -155,6 +155,8 @@ namespace PilotClient
         {
             Position p = await GetPositionAsync();
             displayText(JsonConvert.SerializeObject(p));
+
+            uint trafficId = await AddAITrafficAsync(p);
         }
     }
 }

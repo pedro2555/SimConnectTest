@@ -20,6 +20,12 @@ namespace SimLib
         /// </summary>
         private SimConnect simconnect = null;
 
+        enum GROUPS
+        {
+            ALL,
+            SIMCONNECT_GROUP_PRIORITY_HIGHEST
+        }
+
         enum DEFINITIONS
         {
             Radios,
@@ -31,7 +37,15 @@ namespace SimLib
         {
             Radios,
             Position,
-            AiTraffic
+            AiTraffic,
+            KEY_FREEZE_LATITUDE_LONGITUDE_SET
+        }
+
+        enum EVENTS
+        {
+            REQUEST_AI_SET_SLEW,
+            REQUEST_SET_SLEW_HDG,
+            REQUEST_AI_RELEASE
         }
 
         /// <summary>
@@ -119,6 +133,19 @@ namespace SimLib
                     await Task.Delay(SimConnectPoolCooldown);
                 }
             }
+        }
+
+        public void UpdateAITraffic(uint objectID)
+        {
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_AI_SET_SLEW, "SLEW_ON");
+
+            simconnect.MapClientEventToSimEvent(EVENTS.REQUEST_SET_SLEW_HDG, "AXIS_SLEW_HEADING_SET");
+
+            simconnect.AIReleaseControl(objectID, EVENTS.REQUEST_AI_RELEASE);
+
+            simconnect.TransmitClientEvent(objectID, EVENTS.REQUEST_AI_SET_SLEW, 1, GROUPS.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+
+            simconnect.TransmitClientEvent(objectID, EVENTS.REQUEST_SET_SLEW_HDG, (uint)1000, GROUPS.ALL, SIMCONNECT_EVENT_FLAG.DEFAULT);
         }
     }
 }

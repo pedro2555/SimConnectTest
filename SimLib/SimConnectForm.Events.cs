@@ -51,6 +51,10 @@ namespace SimLib
         private void SimConnect_OnRecvAssignedObjectID(SimConnect sender, SIMCONNECT_RECV_ASSIGNED_OBJECT_ID data)
         {
             AiTraffic.Add(data.dwRequestID, data.dwObjectID);
+
+            Console.WriteLine(data.dwObjectID);
+
+            UpdateAITraffic(data.dwObjectID);
         }
 
             private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
