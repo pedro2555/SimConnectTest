@@ -1,5 +1,6 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -19,6 +20,9 @@ namespace SimLib
         /// </summary>
         public event EventHandler SimConnectClosed;
 
+
+        public Dictionary<uint, uint> AiTraffic = new Dictionary<uint, uint>();
+
         // Set up all the SimConnect related event handlers 
         private void RegisterEvents()
         {
@@ -35,6 +39,8 @@ namespace SimLib
                 simconnect.OnRecvEvent += new SimConnect.RecvEventEventHandler(SimConnect_OnRecvEvent);
                 simconnect.OnRecvSimobjectDataBytype += new SimConnect.RecvSimobjectDataBytypeEventHandler(SimConnect_OnRecvSimobjectDataBytype);
 
+                simconnect.OnRecvAssignedObjectId += new SimConnect.RecvAssignedObjectIdEventHandler(SimConnect_OnRecvAssignedObjectID);
+
             }
             catch (COMException ex)
             {
@@ -42,7 +48,16 @@ namespace SimLib
             }
         }
 
-        private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
+        private void SimConnect_OnRecvAssignedObjectID(SimConnect sender, SIMCONNECT_RECV_ASSIGNED_OBJECT_ID data)
+        {
+            AiTraffic.Add(data.dwRequestID, data.dwObjectID);
+
+            Console.WriteLine(data.dwObjectID);
+
+            UpdateAITraffic(data.dwObjectID);
+        }
+
+            private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
         {
             SimConnectOpen(this, new EventArgs());
         }
