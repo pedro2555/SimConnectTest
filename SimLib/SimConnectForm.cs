@@ -65,7 +65,6 @@ namespace SimLib
 
                     RegisterEvents();
                     RegisterDataDefinitions();
-                    RegisterPosition();
                 }
                 catch (COMException)
                 {
