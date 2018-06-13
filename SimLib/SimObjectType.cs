@@ -70,7 +70,7 @@ namespace SimLib
                                            Pitch = state.pitch,
                                            Bank = state.bank,
                                            Heading = state.heading,
-                                           OnGround = 0,
+                                           OnGround = 1,
                                            Airspeed = state.airspeed
                                        },
                                        (REQUESTS)task.Task.Id);

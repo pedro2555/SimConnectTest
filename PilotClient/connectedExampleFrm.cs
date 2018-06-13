@@ -64,7 +64,7 @@ namespace PilotClient
             FSX.Aircraft traffic = JsonConvert.DeserializeObject<FSX.Aircraft>(
                 e.Data);
 
-            traffic.ModelName = "Piper Pa-24-250 Comanche N6229P";
+            traffic.ModelName = "C172";
 
             FSX.Traffic.Set(traffic);
         }
@@ -98,5 +98,6 @@ namespace PilotClient
 
             await Send();
         }
+
     }
 }

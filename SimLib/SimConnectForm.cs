@@ -73,8 +73,8 @@ namespace SimLib
                         { DatumName = "PLANE HEADING DEGREES TRUE", UnitsName = "degrees",
                             DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
                         new SimObjectType<AircraftState>.Field()
-                        { DatumName = "AIRSPEED TRUE", UnitsName = "knots",
-                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        { DatumName = "GPS GROUND SPEED", UnitsName = "knots",
+                            DatumType = SIMCONNECT_DATATYPE.INT32 },
                     });
 
                     SimObjectType<Radios>.Register(new SimObjectType<Radios>.Field[]
