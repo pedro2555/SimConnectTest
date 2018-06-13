@@ -1,44 +1,31 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
-using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SimLib
 {
-    public class SimConnectForm : Form
+    /// <summary>
+    /// Extends Windows.Forms to provide a wrapped access to SimConnect
+    /// </summary>
+    public partial class SimConnectForm : Form
     {
-        // User-defined win32 event 
-        const int WM_USER_SIMCONNECT = 0x0402;
+        /// <summary>
+        /// The user defined win32 event
+        /// </summary>
+        private const int WM_USER_SIMCONNECT = 0x0402;
 
-        // SimConnect object 
-        SimConnect simconnect = null;
-
-        public enum EVENTS
-        {
-            PITOT_TOGGLE,
-            FLAPS_INC,
-            FLAPS_DEC,
-            FLAPS_UP,
-            FLAPS_DOWN,
-        };
-
-        enum NOTIFICATION_GROUPS
-        {
-            GROUP0,
-        }
-
-        // Simconnect client will send a win32 message when there is 
-        // a packet to process. ReceiveMessage must be called to 
-        // trigger the events. This model keeps simconnect processing on the main thread. 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
         protected override void DefWndProc(ref Message m)
         {
             if (m.Msg == WM_USER_SIMCONNECT)
             {
-                if (simconnect != null)
+                if (FSX.Sim != null)
                 {
-                    simconnect.ReceiveMessage();
+                    FSX.Sim.ReceiveMessage();
                 }
             }
             else
@@ -47,26 +34,57 @@ namespace SimLib
             }
         }
 
-        private void closeConnection()
+        /// <summary>
+        /// Asynchronous wait for a listening SimConnect server.
+        /// 
+        /// Listen to SimConnectOpen event
+        /// </summary>
+        public async void OpenSimConnect()
         {
-            if (simconnect != null)
-            {
-                // Dispose serves the same purpose as SimConnect_Close() 
-                simconnect.Dispose();
-                simconnect = null;
-            }
-        }
-
-        public async void openConnection()
-        {
-            while (simconnect == null)
+            while (FSX.Sim == null)
             {
                 try
                 {
                     // the constructor is similar to SimConnect_Open in the native API 
-                    simconnect = new SimConnect("SimLib.SimLibSimConnect", Handle, WM_USER_SIMCONNECT, null, 0);
+                    FSX.Sim = new SimConnect("SimLib.SimLibSimConnect", Handle, WM_USER_SIMCONNECT, null, 0);
 
-                    initClientEvent();
+                    // Register data definitions
+                    SimObjectType<AircraftState>.Register(new SimObjectType<AircraftState>.Field[]
+                    {
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "Title", UnitsName = null,
+                            DatumType = SIMCONNECT_DATATYPE.STRING256 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "PLANE LATITUDE", UnitsName = "degrees",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "PLANE LONGITUDE", UnitsName = "degrees",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "PLANE ALTITUDE", UnitsName = "feet",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "PLANE PITCH DEGREES", UnitsName = "degrees",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "PLANE BANK DEGREES", UnitsName = "degrees",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "PLANE HEADING DEGREES TRUE", UnitsName = "degrees",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "GPS GROUND SPEED", UnitsName = "knots",
+                            DatumType = SIMCONNECT_DATATYPE.INT32 },
+                    });
+
+                    SimObjectType<Radios>.Register(new SimObjectType<Radios>.Field[]
+                    {
+                        new SimObjectType<Radios>.Field()
+                        { DatumName = "TRANSPONDER CODE:1", UnitsName = "BCO16",
+                            DatumType = SIMCONNECT_DATATYPE.INT32 },
+                    });
+
+                    //RegisterEvents();
                 }
                 catch (COMException)
                 {
@@ -75,70 +93,52 @@ namespace SimLib
             }
         }
 
-        // Set up all the SimConnect related event handlers 
-        private void initClientEvent()
+        /// <summary>
+        /// Dispose the SimConnect object
+        /// object.
+        /// </summary>
+        private void DisposeSimConnect()
         {
-            try
+            if (FSX.Sim != null)
             {
-                // listen to connect and quit msgs 
-                simconnect.OnRecvOpen += new SimConnect.RecvOpenEventHandler(simconnect_OnRecvOpen);
-                simconnect.OnRecvQuit += new SimConnect.RecvQuitEventHandler(simconnect_OnRecvQuit);
-
-                // listen to exceptions 
-                simconnect.OnRecvException += new SimConnect.RecvExceptionEventHandler(simconnect_OnRecvException);
-
-                // listen to events 
-                simconnect.OnRecvEvent += new SimConnect.RecvEventEventHandler(simconnect_OnRecvEvent);
-
-                // subscribe to pitot heat switch toggle 
-                simconnect.MapClientEventToSimEvent(EVENTS.PITOT_TOGGLE, "PITOT_HEAT_TOGGLE");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.PITOT_TOGGLE, false);
-
-                // subscribe to all four flaps controls 
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_UP, "FLAPS_UP");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_UP, false);
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_DOWN, "FLAPS_DOWN");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_DOWN, false);
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_INC, "FLAPS_INCR");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_INC, false);
-                simconnect.MapClientEventToSimEvent(EVENTS.FLAPS_DEC, "FLAPS_DECR");
-                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.FLAPS_DEC, false);
-
-                // set the group priority 
-                simconnect.SetNotificationGroupPriority(NOTIFICATION_GROUPS.GROUP0, SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST);
-
-            }
-            catch (COMException ex)
-            {
-                throw ex;
+                FSX.Sim.Dispose();
+                FSX.Sim = null;
             }
         }
 
-        void simconnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
+        /// <summary>
+        /// Dispose the SimConnect object with form
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
         {
+            DisposeSimConnect();
+
+            base.Dispose(disposing);
         }
 
-        // The case where the user closes Prepar3D 
-        void simconnect_OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
+        private async void WatchSimConnect()
         {
-            closeConnection();
+            while (FSX.Sim != null)
+            {
+                try
+                {
+
+                }
+                catch (COMException)
+                {
+
+                }
+                finally
+                {
+                    await Task.Delay(SimConnectPoolCooldown);
+                }
+            }
         }
 
-        void simconnect_OnRecvException(SimConnect sender, SIMCONNECT_RECV_EXCEPTION data)
+        private void RegisterDataDefinitions()
         {
-        }
 
-        public delegate void SimConnectEvent(SimConnect sender, SIMCONNECT_RECV_EVENT recEvent);
-        public event SimConnectEvent OnSimConnectEvent;
-        private void simconnect_OnRecvEvent(SimConnect sender, SIMCONNECT_RECV_EVENT recEvent)
-        {
-            OnSimConnectEvent(sender, recEvent);
-        }
-
-        // The case where the user closes the client 
-        private void SimConnectForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            closeConnection();
         }
     }
 }
