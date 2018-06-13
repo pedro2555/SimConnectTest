@@ -32,6 +32,7 @@
             this.btnGetPositionAsync = new System.Windows.Forms.Button();
             this.btnGetXpndrAsync = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
+            this.CreateAITraffic = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtLog
@@ -77,11 +78,22 @@
             this.btnConnect.UseVisualStyleBackColor = true;
             this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
+            // CreateAITraffic
+            // 
+            this.CreateAITraffic.Location = new System.Drawing.Point(188, 528);
+            this.CreateAITraffic.Name = "CreateAITraffic";
+            this.CreateAITraffic.Size = new System.Drawing.Size(100, 23);
+            this.CreateAITraffic.TabIndex = 3;
+            this.CreateAITraffic.Text = "CreateAITraffic";
+            this.CreateAITraffic.UseVisualStyleBackColor = true;
+            this.CreateAITraffic.Click += new System.EventHandler(this.CreateAITraffic_Click);
+            // 
             // connectedExampleFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(518, 563);
+            this.Controls.Add(this.CreateAITraffic);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.btnGetXpndrAsync);
             this.Controls.Add(this.btnGetPositionAsync);
@@ -99,6 +111,7 @@
         private System.Windows.Forms.Button btnGetPositionAsync;
         private System.Windows.Forms.Button btnGetXpndrAsync;
         private System.Windows.Forms.Button btnConnect;
+        private System.Windows.Forms.Button CreateAITraffic;
     }
 }
 
