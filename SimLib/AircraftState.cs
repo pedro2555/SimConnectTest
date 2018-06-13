@@ -17,5 +17,6 @@ namespace SimLib
         public double bank;
         public double heading;
         public uint airspeed;
+        public uint onGround;
     }
 }

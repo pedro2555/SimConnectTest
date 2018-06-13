@@ -75,6 +75,9 @@ namespace SimLib
                         new SimObjectType<AircraftState>.Field()
                         { DatumName = "AIRSPEED TRUE", UnitsName = "knots",
                             DatumType = SIMCONNECT_DATATYPE.INT32 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "SIM ON GROUND", UnitsName = "bool",
+                            DatumType = SIMCONNECT_DATATYPE.INT32 },
                     });
 
                     SimObjectType<Radios>.Register(new SimObjectType<Radios>.Field[]
