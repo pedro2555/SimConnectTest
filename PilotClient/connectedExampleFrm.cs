@@ -99,13 +99,5 @@ namespace PilotClient
             await Send();
         }
 
-        private async void CreateAITraffic_Click(object sender, EventArgs e)
-        {
-            FSX.Aircraft player = await FSX.Player.Get();
-
-            player.ModelName = "C172";
-
-            FSX.Traffic.Set(player);
-        }
     }
 }
