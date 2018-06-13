@@ -1,4 +1,5 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace SimLib
                                            Pitch = state.pitch,
                                            Bank = state.bank,
                                            Heading = state.heading,
-                                           OnGround = 0,
+                                           OnGround = 1,
                                            Airspeed = state.airspeed
                                        },
                                        (REQUESTS)task.Task.Id);
@@ -88,7 +89,7 @@ namespace SimLib
             resultTasks.Add(task.Task.Id, task);
             FSX.Sim.SetDataOnSimObject((DEFINITIONS)FSX.typeMap[typeof(T)],
                                        objectId,
-                                       SIMCONNECT_DATA_SET_FLAG.DEFAULT,
+                                       SIMCONNECT_DATA_SET_FLAG.TAGGED,
                                        data);
 
             bool result = await task.Task;
@@ -120,6 +121,7 @@ namespace SimLib
                 FSX.Sim.OnRecvSimobjectDataBytype +=
                     Sim_OnRecvSimobjectDataBytype;
                 FSX.Sim.OnRecvAssignedObjectId += Sim_OnRecvAssignedObjectId;
+                FSX.Sim.OnRecvException += Sim_OnRecvException;
             }
             catch (COMException ex)
             {
@@ -128,6 +130,12 @@ namespace SimLib
 
             FSX.idMap.Add(defineId, typeof(T));
             FSX.typeMap.Add(typeof(T), defineId);
+        }
+        private static void Sim_OnRecvException(SimConnect sender, SIMCONNECT_RECV_EXCEPTION data)
+        {
+            SIMCONNECT_EXCEPTION exception = (SIMCONNECT_EXCEPTION)data.dwException;
+            Console.WriteLine(exception.ToString());
+            //throw new ApplicationException(exception.ToString());
         }
 
         private static void Sim_OnRecvAssignedObjectId(

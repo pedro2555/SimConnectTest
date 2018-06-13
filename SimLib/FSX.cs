@@ -5,6 +5,13 @@ using System.Threading.Tasks;
 
 namespace SimLib
 {
+    public enum CLIENT_EVENTS
+    {
+        EVENT_FREEZE_LATITUDE_LONGITUDE_SET,
+        EVENT_FREEZE_ALTITUDE_SET,
+        EVENT_FREEZE_ATTITUDE_SET
+    }
+
     public static class FSX
     {
         public static SimConnect Sim;
@@ -66,6 +73,25 @@ namespace SimLib
             {
                 ObjectId = await SimObjectType<AircraftState>.
                     AICreateNonATCAircraft(ModelName, Callsign, State);
+
+                FSX.Sim.TransmitClientEvent(
+                    (uint)ObjectId,
+                    CLIENT_EVENTS.EVENT_FREEZE_ALTITUDE_SET,
+                    1,
+                    (REQUESTS)1000,
+                    SIMCONNECT_EVENT_FLAG.DEFAULT);
+                FSX.Sim.TransmitClientEvent(
+                    (uint)ObjectId,
+                    CLIENT_EVENTS.EVENT_FREEZE_ATTITUDE_SET,
+                    1,
+                    (REQUESTS)1000,
+                    SIMCONNECT_EVENT_FLAG.DEFAULT);
+                FSX.Sim.TransmitClientEvent(
+                    (uint)ObjectId,
+                    CLIENT_EVENTS.EVENT_FREEZE_LATITUDE_LONGITUDE_SET,
+                    1,
+                    (REQUESTS)1000,
+                    SIMCONNECT_EVENT_FLAG.DEFAULT);
             }
 
             internal async Task<AircraftState> Read()
@@ -78,6 +104,8 @@ namespace SimLib
 
             public async void Update(Aircraft newTraffic)
             {
+                State = newTraffic.State;
+
                 await SimObjectType<AircraftState>.
                     SetDataOnSimObject((uint)ObjectId, State);
             }

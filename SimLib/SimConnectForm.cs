@@ -52,9 +52,6 @@ namespace SimLib
                     SimObjectType<AircraftState>.Register(new SimObjectType<AircraftState>.Field[]
                     {
                         new SimObjectType<AircraftState>.Field()
-                        { DatumName = "Title", UnitsName = null,
-                            DatumType = SIMCONNECT_DATATYPE.STRING256 },
-                        new SimObjectType<AircraftState>.Field()
                         { DatumName = "PLANE LATITUDE", UnitsName = "degrees",
                             DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
                         new SimObjectType<AircraftState>.Field()
@@ -84,7 +81,15 @@ namespace SimLib
                             DatumType = SIMCONNECT_DATATYPE.INT32 },
                     });
 
-                    //RegisterEvents();
+                    FSX.Sim.MapClientEventToSimEvent(
+                        CLIENT_EVENTS.EVENT_FREEZE_LATITUDE_LONGITUDE_SET,
+                        "FREEZE_LATITUDE_LONGITUDE_SET");
+                    FSX.Sim.MapClientEventToSimEvent(
+                        CLIENT_EVENTS.EVENT_FREEZE_ALTITUDE_SET,
+                        "FREEZE_ALTITUDE_SET");
+                    FSX.Sim.MapClientEventToSimEvent(
+                        CLIENT_EVENTS.EVENT_FREEZE_ATTITUDE_SET,
+                        "FREEZE_ATTITUDE_SET");
                 }
                 catch (COMException)
                 {
