@@ -71,7 +71,7 @@ namespace SimLib
                                            Bank = state.bank,
                                            Heading = state.heading,
                                            OnGround = 1,
-                                           Airspeed = 0
+                                           Airspeed = state.airspeed
                                        },
                                        (REQUESTS)task.Task.Id);
 

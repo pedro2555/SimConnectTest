@@ -16,6 +16,6 @@ namespace SimLib
         public double pitch;
         public double bank;
         public double heading;
-        //public uint airspeed;
+        public uint airspeed;
     }
 }
