@@ -18,5 +18,6 @@ namespace SimLib
         public double heading;
         public uint airspeed;
         public uint onGround;
+        public uint gearPosition;
     }
 }
