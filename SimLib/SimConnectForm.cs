@@ -136,6 +136,9 @@ namespace SimLib
                         new SimObjectType<Radios>.Field()
                         { DatumName = "TRANSPONDER CODE:1", UnitsName = "BCO16",
                             DatumType = SIMCONNECT_DATATYPE.INT32 },
+                        new SimObjectType<Radios>.Field()
+                        { DatumName = "COM ACTIVE FREQUENCY:1", UnitsName = "MHz",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
                     });
 
                     //RegisterEvents();

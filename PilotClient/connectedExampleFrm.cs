@@ -86,6 +86,7 @@ namespace PilotClient
         {
             Radios r = await SimObjectType<Radios>.RequestDataOnSimObjectType();
             displayText(JsonConvert.SerializeObject(r.Transponder.ToString("X3")));
+            displayText(JsonConvert.SerializeObject(r.ActiveCOM1.ToString("F3").Replace(",", ".")));
         }
 
         private async void btnConnect_Click(object sender, EventArgs e)
