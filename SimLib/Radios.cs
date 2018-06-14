@@ -6,5 +6,6 @@ namespace SimLib
     public class Radios
     {
         public int Transponder;
+        public double ActiveCOM1;
     }
 }
