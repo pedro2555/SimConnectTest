@@ -96,6 +96,13 @@ namespace SimLib
                             DatumType = SIMCONNECT_DATATYPE.INT32 },
                     });
 
+                    SimObjectType<Lights>.Register(new SimObjectType<Lights>.Field[]
+                   {
+                        new SimObjectType<Lights>.Field()
+                        { DatumName = "LIGHT ON STATES", UnitsName = "Mask",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                   });
+
                     //RegisterEvents();
                 }
                 catch (COMException)

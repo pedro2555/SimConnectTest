@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lights.cs" />
     <Compile Include="Radios.cs" />
     <Compile Include="SimObjectType.cs" />
     <Compile Include="AircraftState.cs" />
