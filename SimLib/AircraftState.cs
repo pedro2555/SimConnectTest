@@ -19,5 +19,7 @@ namespace SimLib
         public uint airspeed;
         public uint onGround;
         public uint gearPosition;
+        public uint landingLight;
+        public double flapsPosition;
     }
 }
