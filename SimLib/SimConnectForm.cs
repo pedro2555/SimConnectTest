@@ -87,6 +87,12 @@ namespace SimLib
                         new SimObjectType<AircraftState>.Field()
                         { DatumName = "FLAPS HANDLE INDEX", UnitsName = "Number",
                             DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<AircraftState>.Field()
+                        { DatumName = "NUMBER OF ENGINES", UnitsName = "",
+                            DatumType = SIMCONNECT_DATATYPE.INT32 },
+                         new SimObjectType<AircraftState>.Field()
+                        { DatumName = "SPOILERS HANDLE POSITION", UnitsName = "percentage",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
                     });
 
                     SimObjectType<Radios>.Register(new SimObjectType<Radios>.Field[]
@@ -94,6 +100,9 @@ namespace SimLib
                         new SimObjectType<Radios>.Field()
                         { DatumName = "TRANSPONDER CODE:1", UnitsName = "BCO16",
                             DatumType = SIMCONNECT_DATATYPE.INT32 },
+                        new SimObjectType<Radios>.Field()
+                        { DatumName = "COM ACTIVE FREQUENCY:1", UnitsName = "MHz",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
                     });
 
                     //RegisterEvents();
