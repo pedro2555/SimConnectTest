@@ -97,6 +97,15 @@ namespace SimLib
                         new SimObjectType<Radios>.Field()
                         { DatumName = "COM ACTIVE FREQUENCY:1", UnitsName = "MHz",
                             DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<Radios>.Field()
+                        { DatumName = "COM STANDBY FREQUENCY:1", UnitsName = "MHz",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<Radios>.Field()
+                        { DatumName = "COM ACTIVE FREQUENCY:2", UnitsName = "MHz",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
+                        new SimObjectType<Radios>.Field()
+                        { DatumName = "COM STANDBY FREQUENCY:2", UnitsName = "MHz",
+                            DatumType = SIMCONNECT_DATATYPE.FLOAT64 },
                     });
 
                     //RegisterEvents();
