@@ -32,6 +32,8 @@
             this.btnGetPositionAsync = new System.Windows.Forms.Button();
             this.btnGetXpndrAsync = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
+            this.btnGetSimModels = new System.Windows.Forms.Button();
+            this.btnGetServerModels = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtLog
@@ -77,11 +79,35 @@
             this.btnConnect.UseVisualStyleBackColor = true;
             this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
+            // btnGetSimModels
+            // 
+            this.btnGetSimModels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnGetSimModels.Location = new System.Drawing.Point(198, 528);
+            this.btnGetSimModels.Name = "btnGetSimModels";
+            this.btnGetSimModels.Size = new System.Drawing.Size(90, 23);
+            this.btnGetSimModels.TabIndex = 3;
+            this.btnGetSimModels.Text = "GetSim Models";
+            this.btnGetSimModels.UseVisualStyleBackColor = true;
+            this.btnGetSimModels.Click += new System.EventHandler(this.GetMyModels_Click);
+            // 
+            // btnGetServerModels
+            // 
+            this.btnGetServerModels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnGetServerModels.Location = new System.Drawing.Point(93, 528);
+            this.btnGetServerModels.Name = "btnGetServerModels";
+            this.btnGetServerModels.Size = new System.Drawing.Size(99, 23);
+            this.btnGetServerModels.TabIndex = 4;
+            this.btnGetServerModels.Text = "Server Models";
+            this.btnGetServerModels.UseVisualStyleBackColor = true;
+            this.btnGetServerModels.Click += new System.EventHandler(this.btnGetServerModels_Click);
+            // 
             // connectedExampleFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(518, 563);
+            this.Controls.Add(this.btnGetServerModels);
+            this.Controls.Add(this.btnGetSimModels);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.btnGetXpndrAsync);
             this.Controls.Add(this.btnGetPositionAsync);
@@ -99,6 +125,8 @@
         private System.Windows.Forms.Button btnGetPositionAsync;
         private System.Windows.Forms.Button btnGetXpndrAsync;
         private System.Windows.Forms.Button btnConnect;
+        private System.Windows.Forms.Button btnGetSimModels;
+        private System.Windows.Forms.Button btnGetServerModels;
     }
 }
 

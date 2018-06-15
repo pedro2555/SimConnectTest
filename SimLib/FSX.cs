@@ -1,6 +1,7 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SimLib
@@ -66,6 +67,10 @@ namespace SimLib
             {
                 ObjectId = await SimObjectType<AircraftState>.
                     AICreateNonATCAircraft(ModelName, Callsign, State);
+
+                modelMatchingOnServer.Add(new ModelMatchingOnServer { ModelCallsign = "TSZ213", ModelTitle = State.title });
+
+                VerifyModelMatching();
             }
 
             internal async Task<AircraftState> Read()
@@ -83,6 +88,35 @@ namespace SimLib
                 await SimObjectType<AircraftState>.
                     SetDataOnSimObject((uint)ObjectId, State);
             }
+
+            public async void VerifyModelMatching()
+            {
+                foreach (var directory in Directory.GetDirectories(@"C:\\Microsoft Flight Simulator X\\SimObjects\\Airplanes"))
+                {
+                    var dir = new DirectoryInfo(directory);
+                    MyModels.Add(new MyModelMatching { ModelTitle = dir.Name });
+                }
+            }
+        }
+
+        public static List<ModelMatchingOnServer> modelMatchingOnServer = new List<ModelMatchingOnServer>();
+
+        public static List<MyModelMatching> MyModels = new List<MyModelMatching>();
+
+        public class MyModelMatching
+        {
+            public string ModelTitle
+            { get; set; }
+        }
+
+        public class ModelMatchingOnServer
+        {
+            public string ModelCallsign
+            { get; set; }
+
+            public string ModelTitle
+            { get; set; }
+
         }
     }
 }
