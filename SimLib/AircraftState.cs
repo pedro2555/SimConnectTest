@@ -21,7 +21,5 @@ namespace SimLib
         public uint gearPosition;
         public uint landingLight;
         public double flapsPosition;
-        public uint numbersOfEngines;
-        public double spoilersPosition;
     }
 }
