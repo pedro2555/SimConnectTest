@@ -52,7 +52,7 @@ namespace SimLib
                     SimObjectType<AircraftState>.Register(new SimObjectType<AircraftState>.Field[]
                     {
                         new SimObjectType<AircraftState>.Field()
-                        { DatumName = "Title", UnitsName = null,
+                        { DatumName = "ATC MODEL", UnitsName = null,
                             DatumType = SIMCONNECT_DATATYPE.STRING256 },
                         new SimObjectType<AircraftState>.Field()
                         { DatumName = "PLANE LATITUDE", UnitsName = "degrees",

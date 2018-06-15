@@ -8,7 +8,7 @@ namespace SimLib
     public class AircraftState
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public String title;
+        public String model;
         public double latitude;
         public double longitude;
         public double altitude;
