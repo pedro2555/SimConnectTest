@@ -1,14 +1,8 @@
 ﻿using Newtonsoft.Json;
 using SimLib;
 using System;
-using System.Diagnostics;
-using WebSocketSharp;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System.Collections.Generic;
-using System.IO;
+using WebSocketSharp;
 
 namespace PilotClient
 {
