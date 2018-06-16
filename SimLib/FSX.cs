@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SimLib
@@ -49,6 +50,15 @@ namespace SimLib
             }
         }
 
+        public static void GetSimList()
+        {
+            foreach (var directory in Directory.GetDirectories(@"C:\\Microsoft Flight Simulator X\\SimObjects\\Airplanes"))
+            {
+                var dir = new DirectoryInfo(directory);
+                MyModels.Add(new MyModelMatching { ModelTitle = dir.Name });
+            }
+        }
+
         public class Aircraft
         {
             public string Callsign
@@ -70,7 +80,7 @@ namespace SimLib
 
                 modelMatchingOnServer.Add(new ModelMatchingOnServer { ModelCallsign = "TSZ213", ModelTitle = State.title });
 
-                VerifyModelMatching();
+                await VerifyModelMatching();
             }
 
             internal async Task<AircraftState> Read()
@@ -89,12 +99,25 @@ namespace SimLib
                     SetDataOnSimObject((uint)ObjectId, State);
             }
 
-            public async void VerifyModelMatching()
+            public async Task VerifyModelMatching()
             {
-                foreach (var directory in Directory.GetDirectories(@"C:\\Microsoft Flight Simulator X\\SimObjects\\Airplanes"))
+                foreach (var modelOnServer in modelMatchingOnServer)
                 {
-                    var dir = new DirectoryInfo(directory);
-                    MyModels.Add(new MyModelMatching { ModelTitle = dir.Name });
+                    foreach (var simModels in MyModels)
+                    {
+                        try
+                        {
+                            ///compare here
+                            if (File.ReadLines(String.Format("C:\\Microsoft Flight Simulator X\\SimObjects\\Airplanes\\{0}\\aircraft.cfg", simModels.ModelTitle)).Any(line => line.Contains(modelOnServer.ModelTitle)))
+                                Console.WriteLine("True");
+                            else
+                                Console.WriteLine(simModels.ModelTitle);
+                        }
+                        catch (Exception ex)
+                        {
+                            
+                        }
+                    }
                 }
             }
         }
