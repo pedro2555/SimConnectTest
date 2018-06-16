@@ -16,9 +16,24 @@ namespace SimLib
         private const int WM_USER_SIMCONNECT = 0x0402;
 
         /// <summary>
-        /// 
+        /// Internal SimConnect object
         /// </summary>
-        /// <param name="m"></param>
+        private SimConnect simconnect = null;
+
+        public enum EVENTS
+        {
+            PITOT_TOGGLE,
+        };
+
+        enum NOTIFICATION_GROUPS
+        {
+            GROUP0,
+        }
+
+        // Simconnect client will send a win32 message when there is 
+        // a packet to process. ReceiveMessage must be called to 
+        // trigger the events. This model keeps simconnect processing on the main thread. 
+
         protected override void DefWndProc(ref Message m)
         {
             if (m.Msg == WM_USER_SIMCONNECT)
@@ -147,11 +162,41 @@ namespace SimLib
             }
         }
 
+        // Set up all the SimConnect related event handlers 
+        private void initClientEvent()
+        {
+            try
+            {
+                // listen to connect and quit msgs 
+                simconnect.OnRecvOpen += new SimConnect.RecvOpenEventHandler(simconnect_OnRecvOpen);
+                simconnect.OnRecvQuit += new SimConnect.RecvQuitEventHandler(simconnect_OnRecvQuit);
+
+                // listen to exceptions 
+                simconnect.OnRecvException += new SimConnect.RecvExceptionEventHandler(simconnect_OnRecvException);
+
+                // listen to events 
+                simconnect.OnRecvEvent += new SimConnect.RecvEventEventHandler(simconnect_OnRecvEvent);
+
+                // subscribe to pitot heat switch toggle 
+                simconnect.MapClientEventToSimEvent(EVENTS.PITOT_TOGGLE, "PITOT_HEAT_TOGGLE");
+                simconnect.AddClientEventToNotificationGroup(NOTIFICATION_GROUPS.GROUP0, EVENTS.PITOT_TOGGLE, false);
+
+                // set the group priority 
+                simconnect.SetNotificationGroupPriority(NOTIFICATION_GROUPS.GROUP0, SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST);
+
+            }
+            catch (COMException ex)
+            {
+                FSX.Sim.Dispose();
+                FSX.Sim = null;
+            }
+        }
+
         /// <summary>
-        /// Dispose the SimConnect object
-        /// object.
+        /// Dispose the SimConnect object with form
         /// </summary>
-        private void DisposeSimConnect()
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
         {
             if (FSX.Sim != null)
             {

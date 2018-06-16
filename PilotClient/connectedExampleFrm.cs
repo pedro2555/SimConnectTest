@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json;
 using SimLib;
 using System;
-using System.Diagnostics;
-using WebSocketSharp;
-using System.Text;
-using System.Threading;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System.Collections.Generic;
+using WebSocketSharp;
 
 namespace PilotClient
 {
@@ -64,7 +61,7 @@ namespace PilotClient
             FSX.Aircraft traffic = JsonConvert.DeserializeObject<FSX.Aircraft>(
                 e.Data);
 
-            traffic.ModelName = "Piper Pa-24-250 Comanche N6229P";
+            traffic.ModelName = "C172 TSZ";
 
             FSX.Traffic.Set(traffic);
         }
@@ -90,6 +87,8 @@ namespace PilotClient
 
         private async void btnConnect_Click(object sender, EventArgs e)
         {
+            FSX.GetSimList();
+
             webSocket = new WebSocket(@"wss://fa-live.herokuapp.com/chat");
 
             webSocket.OnMessage += Receive;
@@ -97,6 +96,25 @@ namespace PilotClient
             webSocket.Connect();
 
             await Send();
+            
+        }
+
+        private void GetMyModels_Click(object sender, EventArgs e)
+        {
+            displayText("Models on Simulator:");
+            foreach (var a in FSX.MyModels)
+            {
+                Console.WriteLine(File.ReadLines(@"C:\Microsoft Flight Simulator X\SimObjects\NETWORK\C172-P3D\aircraft.cfg").Any(line => line.Contains("C172 TSZ")));
+            }
+        }
+
+        private void btnGetServerModels_Click(object sender, EventArgs e)
+        {
+            displayText("Models on Server:");
+            foreach (var a in FSX.modelMatchingOnServer)
+            {
+                displayText(a.ModelTitle.ToString());
+            }
         }
     }
 }
