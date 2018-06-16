@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using SimLib;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
@@ -85,6 +87,8 @@ namespace PilotClient
 
         private async void btnConnect_Click(object sender, EventArgs e)
         {
+            FSX.GetSimList();
+
             webSocket = new WebSocket(@"wss://fa-live.herokuapp.com/chat");
 
             webSocket.OnMessage += Receive;
@@ -92,6 +96,7 @@ namespace PilotClient
             webSocket.Connect();
 
             await Send();
+            
         }
 
         private void GetMyModels_Click(object sender, EventArgs e)
@@ -99,7 +104,7 @@ namespace PilotClient
             displayText("Models on Simulator:");
             foreach (var a in FSX.MyModels)
             {
-                displayText(a.ModelTitle.ToString());
+                Console.WriteLine(File.ReadLines(@"C:\Microsoft Flight Simulator X\SimObjects\NETWORK\C172-P3D\aircraft.cfg").Any(line => line.Contains("C172 TSZ")));
             }
         }
 
