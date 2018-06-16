@@ -59,7 +59,7 @@ namespace PilotClient
             FSX.Aircraft traffic = JsonConvert.DeserializeObject<FSX.Aircraft>(
                 e.Data);
 
-            traffic.ModelName = "C172 TSZ";
+            traffic.ModelName = "Piper Pa-24-250 Comanche N6229P";
 
             FSX.Traffic.Set(traffic);
         }
@@ -85,6 +85,8 @@ namespace PilotClient
 
         private async void btnConnect_Click(object sender, EventArgs e)
         {
+            FSX.GetSimList();
+
             webSocket = new WebSocket(@"wss://fa-live.herokuapp.com/chat");
 
             webSocket.OnMessage += Receive;
