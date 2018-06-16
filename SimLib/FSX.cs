@@ -1,6 +1,8 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SimLib
@@ -48,6 +50,20 @@ namespace SimLib
             }
         }
 
+        public static string SimulatorPath
+        { get; set; }
+
+        public static void GetSimList(string simPath)
+        {
+            SimulatorPath = simPath;
+
+            foreach (var directory in Directory.GetDirectories(simPath + "\\SimObjects\\Airplanes"))
+            {
+                var dir = new DirectoryInfo(directory);
+                MyModels.Add(new MyModelMatching { ModelTitle = dir.Name });
+            }
+        }
+
         public class Aircraft
         {
             public string Callsign
@@ -65,7 +81,11 @@ namespace SimLib
             public async void Create()
             {
                 ObjectId = await SimObjectType<AircraftState>.
-                    AICreateNonATCAircraft(ModelName, Callsign, State);
+                    AICreateNonATCAircraft(State.title, Callsign, State);
+
+                modelMatchingOnServer.Add(new ModelMatchingOnServer { ModelCallsign = Callsign, ModelTitle = State.title });
+
+                await VerifyModelMatching();
             }
 
             internal async Task<AircraftState> Read()
@@ -83,6 +103,58 @@ namespace SimLib
                 await SimObjectType<AircraftState>.
                     SetDataOnSimObject((uint)ObjectId, State);
             }
+
+            public async Task VerifyModelMatching()
+            {
+
+                int trues = 0;
+
+                foreach (var modelOnServer in modelMatchingOnServer)
+                {
+                    foreach (var simModels in MyModels)
+                    {
+                        try
+                        {
+                            ///compare all models on server and devolve true when installed
+                            if (File.ReadLines(String.Format("{0}\\SimObjects\\Airplanes\\{1}\\aircraft.cfg", SimulatorPath, simModels.ModelTitle)).Any(line => line.Contains(modelOnServer.ModelTitle)))
+                            {
+                                Console.WriteLine(String.Format("{0} are installed with callsign {1}.", modelOnServer.ModelTitle, modelOnServer.ModelCallsign));
+
+                                trues = trues + 1;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+
+                if (trues == 0)
+                {
+                    //Get Model From Other User
+                }
+            }
+        }
+
+        public static List<ModelMatchingOnServer> modelMatchingOnServer = new List<ModelMatchingOnServer>();
+
+        public static List<MyModelMatching> MyModels = new List<MyModelMatching>();
+
+        public class MyModelMatching
+        {
+            public string ModelTitle
+            { get; set; }
+        }
+
+        public class ModelMatchingOnServer
+        {
+            public string ModelCallsign
+            { get; set; }
+
+            public string ModelTitle
+            { get; set; }
+
         }
     }
 }
