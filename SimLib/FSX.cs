@@ -110,8 +110,6 @@ namespace SimLib
                             ///compare here
                             if (File.ReadLines(String.Format("C:\\Microsoft Flight Simulator X\\SimObjects\\Airplanes\\{0}\\aircraft.cfg", simModels.ModelTitle)).Any(line => line.Contains(modelOnServer.ModelTitle)))
                                 Console.WriteLine("True");
-                            else
-                                Console.WriteLine(simModels.ModelTitle);
                         }
                         catch (Exception ex)
                         {
