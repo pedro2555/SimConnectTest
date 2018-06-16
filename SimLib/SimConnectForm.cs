@@ -187,11 +187,16 @@ namespace SimLib
             }
             catch (COMException ex)
             {
-                throw ex;
+                FSX.Sim.Dispose();
+                FSX.Sim = null;
             }
         }
 
-        void simconnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
+        /// <summary>
+        /// Dispose the SimConnect object with form
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
         {
             if (FSX.Sim != null)
             {
