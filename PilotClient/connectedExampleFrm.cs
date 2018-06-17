@@ -29,7 +29,10 @@ namespace PilotClient
         {
             InitializeComponent();
 
-            FSX.Player.Callsign = "TSZ213";
+            FSX.Player.Callsign = "TSZ112";
+
+            if (Properties.Settings.Default.SimulatorPath == "")
+                btnConnect.Enabled = false;
         }
 
         void displayText(string s)
@@ -64,8 +67,6 @@ namespace PilotClient
             FSX.Aircraft traffic = JsonConvert.DeserializeObject<FSX.Aircraft>(
                 e.Data);
 
-            traffic.ModelName = "Piper Pa-24-250 Comanche N6229P";
-
             FSX.Traffic.Set(traffic);
         }
 
@@ -90,6 +91,8 @@ namespace PilotClient
 
         private async void btnConnect_Click(object sender, EventArgs e)
         {
+            FSX.GetSimList(Properties.Settings.Default.SimulatorPath);
+
             webSocket = new WebSocket(@"wss://fa-live.herokuapp.com/chat");
 
             webSocket.OnMessage += Receive;
@@ -97,6 +100,17 @@ namespace PilotClient
             webSocket.Connect();
 
             await Send();
+        }
+
+        private void btnSimPath_Click(object sender, EventArgs e)
+        {
+            getSimulatorPathDialog.ShowDialog();
+
+            Properties.Settings.Default.SimulatorPath = getSimulatorPathDialog.SelectedPath;
+
+            Properties.Settings.Default.Save();
+
+            btnConnect.Enabled = true;
         }
     }
 }

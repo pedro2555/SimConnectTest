@@ -1,7 +1,12 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SimLib
 {
@@ -48,6 +53,36 @@ namespace SimLib
             }
         }
 
+        public static string SimulatorPath
+        { get; set; }
+
+        public static void GetSimList(string simPath)
+        {
+            SimulatorPath = simPath;
+
+            foreach (var directory in Directory.GetDirectories(simPath + "\\SimObjects\\Airplanes"))
+            {
+                var dir = new DirectoryInfo(directory);
+                MySimModels.Add(new MyModelMatching { ModelTitle = dir.Name });
+            }
+
+            foreach (var directory in Directory.GetDirectories(simPath + "\\SimObjects\\NETWORK"))
+            {
+                var dir = new DirectoryInfo(directory);
+                MyNetModels.Add(new MyModelMatching { ModelTitle = dir.Name });
+            }
+        }
+
+        public static List<MyModelMatching> MySimModels = new List<MyModelMatching>();
+
+        public static List<MyModelMatching> MyNetModels = new List<MyModelMatching>();
+
+        public class MyModelMatching
+        {
+            public string ModelTitle
+            { get; set; }
+        }
+
         public class Aircraft
         {
             public string Callsign
@@ -64,8 +99,15 @@ namespace SimLib
 
             public async void Create()
             {
+                if (Callsign != "TSZ112")
+                {
+                    MyNetModels.Add(new MyModelMatching { ModelTitle = State.title });
+
+                    await VerifyInstalledModel(State.title);
+                }
+
                 ObjectId = await SimObjectType<AircraftState>.
-                    AICreateNonATCAircraft(ModelName, Callsign, State);
+                    AICreateNonATCAircraft(State.title, Callsign, State);            
             }
 
             internal async Task<AircraftState> Read()
@@ -82,6 +124,85 @@ namespace SimLib
 
                 await SimObjectType<AircraftState>.
                     SetDataOnSimObject((uint)ObjectId, State);
+            }
+
+            public async Task VerifyInstalledModel(string model)
+            {
+                int trues = 0;
+
+                try
+                {
+                    foreach (var simModels in MySimModels)
+                    {
+                        string[] allFiles = Directory.GetFiles(String.Format("{0}\\SimObjects\\Airplanes\\{1}", SimulatorPath, simModels.ModelTitle), "*.cfg");
+
+                        foreach (string file in allFiles)
+                        {
+                            string[] lines = File.ReadAllLines(file);
+                            string firstOccurrence = lines.FirstOrDefault(l => l.Contains(model));
+                            if (firstOccurrence != null)
+                            {
+                                trues = trues + 1;
+                            }
+                        }
+                    }
+
+                    foreach (var netModels in MyNetModels)
+                    {
+                        string[] allModelFiles = Directory.GetFiles(String.Format("{0}\\SimObjects\\NETWORK\\{1}", SimulatorPath, netModels.ModelTitle), "*.cfg");
+
+                        foreach (string file in allModelFiles)
+                        {
+                            string[] lines = File.ReadAllLines(file);
+                            string firstOccurrence = lines.FirstOrDefault(l => l.Contains(model));
+                            if (firstOccurrence != null)
+                            {
+                                trues = trues + 1;
+
+                            }
+                        }
+                    }
+                }
+                catch (DirectoryNotFoundException ex)
+                {
+                    Console.WriteLine(ex);
+
+                    await GetModelMatch(model);
+                }
+            }
+        }  
+        
+        public async static Task GetModelMatch(string model)
+        { 
+
+            string extractPath = String.Format("{0}\\SimObjects\\NETWORK\\{1}", SimulatorPath, model);
+
+            string zipPath = String.Format("{0}.zip", extractPath);
+
+            using (WebClient Client = new WebClient())
+            {
+
+                Uri uri = new Uri(String.Format("https://flyatlantic-va.com/simModels/{0}.zip", model));
+
+                Client.DownloadFileCompleted += Client_DownloadFileCompleted;
+
+                Client.DownloadFileAsync(uri, String.Format("{0}\\SimObjects\\NETWORK\\{1}.zip", SimulatorPath, model));
+
+                void Client_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+                {
+                    if (e.Error == null) {
+                        
+                        ZipFile.ExtractToDirectory(zipPath, extractPath);
+
+                        File.Delete(zipPath);
+
+                        MessageBox.Show(String.Format("{0} is now installed restart your simulator for view new MTL.", model));
+                    }
+                    else
+                    {
+                        MessageBox.Show(String.Format("{0} not exists on server and not appears on simulator", model));
+                    }
+                }              
             }
         }
     }
