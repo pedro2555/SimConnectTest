@@ -32,6 +32,9 @@
             this.btnGetPositionAsync = new System.Windows.Forms.Button();
             this.btnGetXpndrAsync = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
+            this.btnSimPath = new System.Windows.Forms.Button();
+            this.getSimulatorPathDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.btnGetMTLFromServer = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtLog
@@ -77,11 +80,40 @@
             this.btnConnect.UseVisualStyleBackColor = true;
             this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
+            // btnSimPath
+            // 
+            this.btnSimPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSimPath.Location = new System.Drawing.Point(190, 528);
+            this.btnSimPath.Name = "btnSimPath";
+            this.btnSimPath.Size = new System.Drawing.Size(98, 23);
+            this.btnSimPath.TabIndex = 3;
+            this.btnSimPath.Text = "Change SimPath";
+            this.btnSimPath.UseVisualStyleBackColor = true;
+            this.btnSimPath.Click += new System.EventHandler(this.btnSimPath_Click);
+            // 
+            // getSimulatorPathDialog
+            // 
+            this.getSimulatorPathDialog.Description = "Select FSX/P3D Main Folder";
+            this.getSimulatorPathDialog.RootFolder = System.Environment.SpecialFolder.MyComputer;
+            // 
+            // btnGetMTLFromServer
+            // 
+            this.btnGetMTLFromServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnGetMTLFromServer.Location = new System.Drawing.Point(93, 528);
+            this.btnGetMTLFromServer.Name = "btnGetMTLFromServer";
+            this.btnGetMTLFromServer.Size = new System.Drawing.Size(91, 23);
+            this.btnGetMTLFromServer.TabIndex = 4;
+            this.btnGetMTLFromServer.Text = "GetServerMTLs";
+            this.btnGetMTLFromServer.UseVisualStyleBackColor = true;
+            this.btnGetMTLFromServer.Click += new System.EventHandler(this.btnGetModelFromServer_Click);
+            // 
             // connectedExampleFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(518, 563);
+            this.Controls.Add(this.btnGetMTLFromServer);
+            this.Controls.Add(this.btnSimPath);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.btnGetXpndrAsync);
             this.Controls.Add(this.btnGetPositionAsync);
@@ -99,6 +131,9 @@
         private System.Windows.Forms.Button btnGetPositionAsync;
         private System.Windows.Forms.Button btnGetXpndrAsync;
         private System.Windows.Forms.Button btnConnect;
+        private System.Windows.Forms.Button btnSimPath;
+        private System.Windows.Forms.FolderBrowserDialog getSimulatorPathDialog;
+        private System.Windows.Forms.Button btnGetMTLFromServer;
     }
 }
 
