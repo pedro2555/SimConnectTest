@@ -93,7 +93,7 @@ namespace SimLib
                         new SimObjectType<AircraftState>.Field()
                         { DatumName = "LIGHT BEACON", UnitsName = "bool",
                             DatumType = SIMCONNECT_DATATYPE.INT32 },
-o                        new SimObjectType<AircraftState>.Field()
+                        new SimObjectType<AircraftState>.Field()
                         { DatumName = "LIGHT NAV", UnitsName = "bool",
                             DatumType = SIMCONNECT_DATATYPE.INT32 },
                         new SimObjectType<AircraftState>.Field()
