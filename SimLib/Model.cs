@@ -52,7 +52,7 @@ namespace SimLib
         /// TODO: look this up, somehow
         /// </summary>
         private const string simrootpath =
-            @"C:\Program Files (x86)\Lockheed Martin\Prepar3D v3";
+            @"C:\Microsoft Flight Simulator X";
 
         /// <summary>
         /// The name of the model folder as installed in
@@ -93,7 +93,7 @@ namespace SimLib
 
                 // get the texture entry name
                 Name = section.Keys["title"];
-                folders.Add("texture." + Name);
+                folders.Add("texture." + section.Keys["texture"]);
 
                 // get any specific model folders
                 if (section.Keys["model"] != "")
@@ -137,6 +137,7 @@ namespace SimLib
                 new Regex(@"(//.*$)|(;.*$)|(^(-)+$)");
             cfgFile.Parser.Configuration.AllowDuplicateKeys = true;
             cfgFile.Parser.Configuration.SkipInvalidLines = true;
+            cfgFile.Parser.Configuration.AllowDuplicateSections = true;
 
             // read CFG file, it's just an INI file format
             return cfgFile.ReadFile(
@@ -173,6 +174,134 @@ namespace SimLib
             }
 
             return result;
+        }
+
+        private void WriteAircraftCFGFile(IniData data)
+        {
+            FileIniDataParser parser = new FileIniDataParser();
+
+            parser.WriteFile(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, "aircraft.cfg"), data);
+        }
+
+        private void GetSectionsForNewModelCFG(string modelTitle)
+        {
+            IniData iniData = new IniData();
+
+            foreach (var section in ConfigSections)
+            {
+                string[] sectionSplit = section.SectionName.Split('.');
+
+                foreach (var sectionKey in section.Keys)
+                {
+                    if (sectionKey.Value == modelTitle)
+                    {
+                        iniData.Sections.Add(section);
+                    }
+                }
+
+                if (sectionSplit[0] != "fltsim")
+                {
+                    iniData.Sections.Add(section);
+                }
+            }
+
+            WriteAircraftCFGFile(iniData);
+        }
+
+        private void GetSectionsForExistModelCFG(string modelTitle)
+        {
+            IniData iniData = new IniData();
+
+            foreach (var section in ConfigSections)
+            {
+                string[] sectionSplit = section.SectionName.Split('.');
+
+                foreach (var sectionKey in section.Keys)
+                {
+                    if (sectionKey.Value == modelTitle)
+                    {
+                        iniData.Sections.Add(section);
+                    }
+                }
+
+            }
+
+            iniData.Merge(GetConfigData(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name)));
+
+            WriteAircraftCFGFile(iniData);
+        }
+
+        private void WriteMainModelFolders()
+        {
+            if (!Directory.Exists(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name)))
+                Directory.CreateDirectory(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name));
+
+            foreach (string folder in Folders)
+            {
+                if (!Directory.Exists(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, folder)))
+                    Directory.CreateDirectory(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, folder));
+
+                foreach (var file in Directory.GetFiles(Path.Combine(simrootpath, "SimObjects", "Airplanes", Name, folder)))
+                {
+                    if (!File.Exists(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, folder, Path.GetFileName(file))))
+                        File.Copy(
+                            Path.Combine(simrootpath, "SimObjects", "Airplanes", Name, folder, Path.GetFileName(file)), 
+                            Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, folder, Path.GetFileName(file))
+                            );
+                }
+            }
+        }
+
+        private void GetTextureFolder(string modelTitle)
+        {
+            foreach (var texture in Textures)
+            {
+                if (texture.Name == modelTitle)
+                    InstallTextureFolder(texture.Folders[0]);               
+            }
+
+            void InstallTextureFolder(string texture)
+            {
+                Directory.CreateDirectory(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, texture));
+
+                foreach (var file in Directory.GetFiles(Path.Combine(simrootpath, "SimObjects", "Airplanes", Name, texture)))
+                {
+                    if (!File.Exists(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, texture, Path.GetFileName(file))))
+                        File.Copy(
+                            Path.Combine(simrootpath, "SimObjects", "Airplanes", Name, texture, Path.GetFileName(file)), 
+                            Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, texture, Path.GetFileName(file))
+                            );
+                }
+
+                InstallAirFile();
+            }
+
+            void InstallAirFile()
+            {
+                foreach (var section in ConfigSections)
+                {
+                    if (section.Keys["title"] == modelTitle)
+                        if (!File.Exists(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, Path.GetFileName(section.Keys["sim"].ToString() + ".air"))))
+                            File.Copy(
+                                Path.Combine(simrootpath, "SimObjects", "Airplanes", Name, Path.GetFileName(section.Keys["sim"].ToString() + ".air")), 
+                                Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, Path.GetFileName(section.Keys["sim"].ToString() + ".air"))
+                                );
+                }
+            }
+        }
+
+        public void Install(string modelTitle)
+        {
+            
+            WriteMainModelFolders();            
+
+            if (!File.Exists(Path.Combine(simrootpath, "SimObjects", "NETWORK", Name, "aircraft.cfg")))
+                GetSectionsForNewModelCFG(modelTitle);
+            else
+                GetSectionsForExistModelCFG(modelTitle);
+
+            GetTextureFolder(modelTitle);
+
         }
     }
 }
